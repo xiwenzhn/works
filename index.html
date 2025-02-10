@@ -17,6 +17,31 @@
       margin: 0;
       padding: 20px;
     }
+    .control-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .control-button {
+      background: #0000ff;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    .control-button:hover {
+      background: #0000cc;
+    }
 
     .image-column {
       position: absolute;
@@ -97,6 +122,9 @@
   </style>
 </head>
 <body>
+  <div class="control-panel">
+    <button id="playPauseBtn" class="control-button">Pause Animation</button>
+  </div>
   <div class="image-column">
     <img src="https://i.postimg.cc/brQR3Rd6/IMG-8233.jpg" alt="Image 1">
     <img src="https://i.postimg.cc/SRrMn1np/Screen-Shot-2024-11-27-at-1-07-23-AM.png" alt="Image 2">
@@ -163,6 +191,22 @@
   </div>
 
   <script>
+    let isAnimationPaused = false;
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    
+    playPauseBtn.addEventListener('click', () => {
+      isAnimationPaused = !isAnimationPaused;
+      playPauseBtn.textContent = isAnimationPaused ? 'Resume Animation' : 'Pause Animation';
+      document.body.classList.toggle('paused', isAnimationPaused);
+      
+      // Reset all letters to their original position when paused
+      if (isAnimationPaused) {
+        const letters = document.querySelectorAll('.animated-text span');
+        letters.forEach(letter => {
+          letter.style.transform = 'translate(0, 0)';
+        });
+      }
+    });
     document.addEventListener('mousemove', function(e) {
       const letters = document.querySelectorAll('.animated-text span');
       const mouseX = e.clientX;
