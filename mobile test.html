@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xiwen Zhang</title>
+  <style>
+    @font-face {
+      font-family: 'ABCGrow-A-Trial';
+      src: url('ABCGrow-A-Trial.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      display: flex;
+      margin: 0;
+      padding: 20px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .control-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .control-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      pointer-events: auto;
+      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
+      font-size: 16px;
+      color: black;
+      mix-blend-mode: difference;
+    }
+
+    .image-row {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      pointer-events: auto;
+      z-index: -1;
+    }
+
+    .image-page {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      gap: 20px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .image-page img {
+      width: auto;
+      height: 40vh;
+      max-width: 40vw;
+      object-fit: contain;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 20px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .animated-text-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .text-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .animated-text {
+      flex: 1;
+      margin: 0 10px;
+      position: relative;
+      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
+      color: black;
+      text-decoration: none;
+      mix-blend-mode: difference;
+    }
+
+    .animated-text span {
+      display: inline-block;
+      transition: transform 0.1s ease-out;
+    }
+
+    .animated-text:hover span {
+      color: black;
+    }
+
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+      .control-panel {
+        display: none; /* Hide play/pause button on mobile */
+      }
+
+      .image-page img {
+        width: 100%; /* Full width on mobile */
+        height: auto; /* Maintain aspect ratio */
+        max-width: 100%; /* Remove max-width restriction */
+      }
+
+      .animated-text-container {
+        flex-direction: column; /* Stack columns on mobile */
+      }
+
+      .text-row {
+        flex-direction: column; /* Stack text rows on mobile */
+        gap: 10px; /* Add spacing between stacked rows */
+      }
+
+      .animated-text span {
+        transition: none !important; /* Disable text animation on mobile */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="control-panel">
+    <button id="playPauseBtn" class="control-button">PAUSE</button>
+  </div>
+  <div class="image-row">
+    <!-- Image pages will be dynamically generated here -->
+  </div>
+
+  <div class="main-content">
+    <div class="animated-text-container">
+      <!-- First row -->
+      <div class="text-row">
+        <a href="1.jpeg" class="animated-text">
+          <i>XIWEN ZHANG</i>  <span>i</span><span>s</span> <span>a</span><span>n</span> <span>i</span><span>n</span><span>t</span><span>e</span><span>r</span><span>d</span><span>i</span><span>s</span><span>c</span><span>i</span><span>p</span><span>l</span><span>i</span><span>n</span><span>a</span><span>r</span><span>y</span> <span>a</span><span>r</span><span>t</span><span>i</span><span>s</span><span>t</span> <span>a</span><span>n</span><span>d</span> <span>d</span><span>e</span><span>s</span><span>i</span><span>g</span><span>n</span><span>e</span><span>r</span> <span>s</span><span>p</span><span>e</span><span>c</span><span>i</span><span>a</span><span>l</span><span>i</span><span>s</span><span>i</span><span>n</span><span>g</span> <span>i</span><span>n</span> <span>f</span><span>i</span><span>l</span><span>m</span> <span>a</span><span>n</span><span>d</span> <span>v</span><span>i</span><span>d</span><span>e</span><span>o</span><span>.</span> <span>T</span><span>h</span><span>e</span> <span>f</span><span>o</span><span>l</span><span>l</span><span>o</span><span>w</span><span>i</span><span>n</span><span>g</span> <span>w</span><span>o</span><span>r</span><span>k</span> <span>h</span><span>a</span><span>s</span> <span>b</span><span>e</span><span>e</span><span>n</span> <span>c</span><span>r</span><span>e</span><span>a</span><span>t</span><span>e</span><span>d</span> <span>a</span><span>n</span><span>d</span> <span>c</span><span>o</span><span>m</span><span>p</span><span>i</span><span>l</span><span>e</span><span>d</span> <span>f</span><span>r</span><span>o</span><span>m</span> <span>t</span><span>h</span><span>e</span> <span>y</span><span>e</span><span>a</span><span>r</span> 2022 - 2024 <span>a</span><span>s</span> <span>a</span> <span>n</span> <span>e</span><span>f</span><span>f</span><span>o</span><span>r</span><span>t</span> <span>t</span><span>o</span> <span>g</span><span>i</span><span>v</span><span>e</span> <span>p</span><span>h</span><span>y</span><span>s</span><span>i</span><span>c</span><span>a</span><span>l</span> <span>f</span><span>o</span><span>r</span><span>m</span> <span>t</span><span>to</span> <span>t</span><span>h</span><span>e</span> <span>l</span><span>a</span><span>b</span><span>y</span><span>r</span><span>i</span><span>n</span><span>t</span><span>h</span> <span>o</span><span>f</span> <span>i</span><span>d</span><span>e</span><span>a</span><span>s</span> <span>a</span><span>n</span><span>d</span> <span>t</span><span>h</span><span>o</span><span>u</span><span>g</span><span>h</span><span>t</span><span>s</span> <span>a</span><span>n</span><span>d</span> <span>f</span><span>e</span><span>e</span><span>l</span><span>i</span><span>n</span><span>g</span><span>s</span> <span>i</span><span>n</span> <span>m</span><span>y</span> <span>m</span><span>i</span><span>n</span><span>d</span>.
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isAnimationPaused = false;
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const imageRow = document.querySelector('.image-row');
+    const imageUrls = [
+      "ezgif.com-video-to-gif-converter.gif",
+      "file:///Users/xiwenzhang/Downloads/IMG_0592-ezgif.com-instagif.gif",
+      "https://i.postimg.cc/SRrMn1np/Screen-Shot-2024-11-27-at-1-07-23-AM.png",
+      "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
+      "https://i.postimg.cc/Pqg3yJ25/2479967c-a373-4052-b1db-1a10775d2986.jpg",
+      "https://i.postimg.cc/Dy368mz2/img20240112-18013584.jpg",
+      "https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png",
+      "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
+      "trimedvideo-ezgif.com-video-to-gif-converter"
+    ];
+
+    // Function to generate random number of images per page (1 to 4)
+    function getRandomNumberOfImages() {
+      return Math.floor(Math.random() * 4) + 1;
+    }
+
+    // Function to distribute images into pages
+    function distributeImages() {
+      let currentIndex = 0;
+      while (currentIndex < imageUrls.length) {
+        const page = document.createElement('div');
+        page.classList.add('image-page');
+        const numImages = getRandomNumberOfImages();
+        for (let i = 0; i < numImages && currentIndex < imageUrls.length; i++) {
+          const img = document.createElement('img');
+          img.src = imageUrls[currentIndex];
+          img.alt = `Image ${currentIndex + 1}`;
+          page.appendChild(img);
+          currentIndex++;
+        }
+        imageRow.appendChild(page);
+      }
+    }
+
+    // Call the function to distribute images
+    distributeImages();
+
+    // Disable play/pause button and text animation on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      playPauseBtn.style.display = 'none'; // Hide play/pause button
+      const letters = document.querySelectorAll('.animated-text span');
+      letters.forEach(letter => {
+        letter.style.transition = 'none'; // Disable text animation
+      });
+    } else {
+      playPauseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isAnimationPaused = !isAnimationPaused;
+        playPauseBtn.textContent = isAnimationPaused ? 'PLAY' : 'PAUSE';
+        document.body.classList.toggle('paused', isAnimationPaused);
+
+        if (isAnimationPaused) {
+          const letters = document.querySelectorAll('.animated-text span');
+          letters.forEach(letter => {
+            letter.style.transform = 'translate(0, 0)';
+          });
+        }
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        if (isAnimationPaused) return;
+
+        const letters = document.querySelectorAll('.animated-text span');
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        letters.forEach(letter => {
+          const letterRect = letter.getBoundingClientRect();
+          const letterX = letterRect.left + letterRect.width / 2;
+          const letterY = letterRect.top + letterRect.height / 2;
+          const deltaX = mouseX - letterX;
+          const deltaY = mouseY - letterY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const maxDistance = Math.min(window.innerWidth, window.innerHeight) / 2;
+          const scaleFactor = Math.max(0.2, 1 - distance / maxDistance);
+
+          letter.style.transform = `translate(${deltaX * scaleFactor}px, ${deltaY * scaleFactor}px)`;
+        });
+
+        const leftThird = window.innerWidth / 3;
+        const rightThird = window.innerWidth * 2 / 3;
+
+        if (e.clientX < leftThird) {
+          document.body.style.cursor = 'w-resize';
+        } else if (e.clientX > rightThird) {
+          document.body.style.cursor = 'e-resize';
+        } else {
+          document.body.style.cursor = 'default';
+        }
+      });
+    }
+
+    // Image click-through functionality
+    const imagePages = document.querySelectorAll('.image-page');
+    let currentPage = 0;
+
+    document.addEventListener('click', function(e) {
+      const leftThird = window.innerWidth / 3;
+      const rightThird = window.innerWidth * 2 / 3;
+
+      if (e.clientX < leftThird) {
+        currentPage = (currentPage - 1 + imagePages.length) % imagePages.length;
+      } else if (e.clientX > rightThird) {
+        currentPage = (currentPage + 1) % imagePages.length;
+      }
+
+      imageRow.scrollTo({
+        left: currentPage * window.innerWidth,
+        behavior: 'smooth'
+      });
+    });
+  </script>
+</body>
+</html>
