@@ -7,8 +7,8 @@
   <style>
     @font-face {
       font-family: 'ABCGrow-A-Trial';
-      src: url('ABCGrow-A-Trial.otf') format('opentype');
-      font-weight: normal;
+      src: url('ABCGrow-A-Trial.ttf') format('truetype'); /* Update the font file name and format */
+      font-weight: bold;
       font-style: normal;
     }
 
@@ -17,7 +17,7 @@
       margin: 0;
       padding: 20px;
       overflow: hidden; /* Prevent scrolling */
-      background: black; /* Ensure a contrasting background for blending mode */
+      background: white; /* Ensure a contrasting background for blending mode */
     }
 
     .control-panel {
@@ -36,8 +36,7 @@
       pointer-events: auto; /* Make the button clickable */
       font-family: 'ABCGrow-A-Trial', Arial, sans-serif; /* Use the new font family */
       font-size: 16px; /* Adjust size as needed */
-      color: white; /* Change text color to black */
-      mix-blend-mode: multiply; /* Apply difference blending mode */
+      color: green; /* Change text color to black */
     }
 
     .image-row {
@@ -47,22 +46,32 @@
       width: 100%;
       height: 100%;
       display: flex;
-      align-items: center;
       overflow-x: auto; /* Enable horizontal scrolling */
-      scroll-snap-type: x mandatory; /* Snap to each image */
+      scroll-snap-type: x mandatory; /* Snap to each page */
       scroll-behavior: smooth; /* Smooth scrolling */
       pointer-events: auto; /* Allow clicks on images */
       z-index: -1;
     }
 
-    .image-row img {
-      scroll-snap-align: start; /* Snap each image to the start */
-      flex: 0 0 auto; /* Prevent resizing */
+    .image-page {
+      display: flex;
+      flex-wrap: wrap; /* Allow images to wrap to the next row */
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      gap: 20px; /* Space between images */
+      padding: 20px; /* Add padding to prevent cutting off */
+      overflow-y: auto; /* Allow vertical scrolling if necessary */
+    }
+
+    .image-page img {
       width: auto;
-      height: 100vh; /* Full height of the viewport */
+      height: 40vh; /* Adjusted height */
+      max-width: 40vw; /* Adjusted width */
       object-fit: contain; /* Keep aspect ratio without cropping */
-      pointer-events: auto; /* Allow clicks on images */
-      cursor: e-resize; /* Right arrow cursor */
     }
 
     .main-content {
@@ -93,18 +102,9 @@
       margin: 0 10px;
       position: relative;
       font-family: 'ABCGrow-A-Trial', Arial, sans-serif; /* Use the new font family */
-      color:white; /* Ensure text color is black */
+      color: rgb(7, 76, 215); /* Ensure text color is black */
       text-decoration: none;
-      mix-blend-mode: multiply; /* Apply blending mode to text */
-    }
-
-    .thumbnail {
-      width: 100px;
-      height: auto;
-    }
-
-    .thumbnail2 {
-      width: 200px;
+      font-weight: bold;
     }
 
     .animated-text span {
@@ -122,13 +122,7 @@
     <button id="playPauseBtn" class="control-button">PAUSE</button>
   </div>
   <div class="image-row">
-    <img src="https://i.postimg.cc/brQR3Rd6/IMG-8233.jpg" alt="Image 1">
-    <img src="https://i.postimg.cc/SRrMn1np/Screen-Shot-2024-11-27-at-1-07-23-AM.png" alt="Image 2">
-    <img src="https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png" alt="Image 3">
-    <img src="https://i.postimg.cc/Pqg3yJ25/2479967c-a373-4052-b1db-1a10775d2986.jpg" alt="Image 4">
-    <img src="https://i.postimg.cc/Dy368mz2/img20240112-18013584.jpg" alt="Image 5">
-    <img src="https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png" alt="Image 6">
-    <img src="https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png" alt="Image 7">
+    <!-- Image pages will be dynamically generated here -->
   </div>
 
   <div class="main-content">
@@ -183,14 +177,51 @@
                   <span>C</span><span>i</span><span>n</span><span>e</span><span>m</span><span>a</span><span>t</span><span>i</span><span>c</span> <span>e</span><span>x</span><span>p</span><span>l</span><span>o</span><span>r</span><span>a</span><span>t</span><span>i</span><span>o</span><span>n</span><span>s</span> <span>o</span><span>f</span> <span>m</span><span>o</span><span>v</span><span>e</span><span>m</span><span>e</span><span>n</span><span>t</span><span>.</span>
                 </a>
       </div>
-      <!-- Other rows and content remain unchanged -->
     </div>
   </div>
 
   <script>
     let isAnimationPaused = false;
     const playPauseBtn = document.getElementById('playPauseBtn');
-    
+    const imageRow = document.querySelector('.image-row');
+    const imageUrls = [
+      "ezgif.com-video-to-gif-converter.gif", // Local GIF file (place it in the same directory as your HTML file)
+      "IMG_0592-ezgif.com-instagif.gif", // New GIF file
+      "https://i.postimg.cc/SRrMn1np/Screen-Shot-2024-11-27-at-1-07-23-AM.png",
+      "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
+      "https://i.postimg.cc/Pqg3yJ25/2479967c-a373-4052-b1db-1a10775d2986.jpg",
+      "https://i.postimg.cc/wBVk5ZBQ/Screen-Shot-2024-09-02-at-3-58-33-PM.png",
+      "https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png",
+      "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
+      "https://i.postimg.cc/j5TP1XDd/ticket-design.jpg"
+    ];
+
+    // Function to generate random number of images per page (1 to 4)
+    function getRandomNumberOfImages() {
+      return Math.floor(Math.random() * 4) + 1;
+    }
+
+    // Function to distribute images into pages
+    function distributeImages() {
+      let currentIndex = 0;
+      while (currentIndex < imageUrls.length) {
+        const page = document.createElement('div');
+        page.classList.add('image-page');
+        const numImages = getRandomNumberOfImages();
+        for (let i = 0; i < numImages && currentIndex < imageUrls.length; i++) {
+          const img = document.createElement('img');
+          img.src = imageUrls[currentIndex];
+          img.alt = `Image ${currentIndex + 1}`;
+          page.appendChild(img);
+          currentIndex++;
+        }
+        imageRow.appendChild(page);
+      }
+    }
+
+    // Call the function to distribute images
+    distributeImages();
+
     playPauseBtn.addEventListener('click', (e) => {
       e.stopPropagation(); // Prevent click from reaching the images
       isAnimationPaused = !isAnimationPaused;
@@ -225,18 +256,38 @@
 
         letter.style.transform = `translate(${deltaX * scaleFactor}px, ${deltaY * scaleFactor}px)`;
       });
+
+      // Cursor change logic
+      const leftThird = window.innerWidth / 3;
+      const rightThird = window.innerWidth * 2 / 3;
+
+      if (e.clientX < leftThird) {
+        document.body.style.cursor = 'w-resize';
+      } else if (e.clientX > rightThird) {
+        document.body.style.cursor = 'e-resize';
+      } else {
+        document.body.style.cursor = 'default';
+      }
     });
 
     // Image click-through functionality
-    const imageRow = document.querySelector('.image-row');
-    const images = document.querySelectorAll('.image-row img');
-    let currentIndex = 0;
+    const imagePages = document.querySelectorAll('.image-page');
+    let currentPage = 0;
 
-    document.addEventListener('click', () => {
-      currentIndex = (currentIndex + 1) % images.length;
-      const scrollPosition = images[currentIndex].offsetLeft;
+    document.addEventListener('click', function(e) {
+      const leftThird = window.innerWidth / 3;
+      const rightThird = window.innerWidth * 2 / 3;
+      
+      if (e.clientX < leftThird) {
+        // Move to previous page
+        currentPage = (currentPage - 1 + imagePages.length) % imagePages.length;
+      } else if (e.clientX > rightThird) {
+        // Move to next page
+        currentPage = (currentPage + 1) % imagePages.length;
+      }
+      
       imageRow.scrollTo({
-        left: scrollPosition,
+        left: currentPage * window.innerWidth,
         behavior: 'smooth'
       });
     });
