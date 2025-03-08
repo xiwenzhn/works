@@ -7,8 +7,8 @@
   <style>
     @font-face {
       font-family: 'ABCGrow-A-Trial';
-      src: url('ABCGrow-A-Trial.ttf') format('truetype'); /* Update the font file name and format */
-      font-weight: bold;
+      src: url('ABCGrow-A-Trial.ttf') format('truetype');
+      font-weight: normal;
       font-style: normal;
     }
 
@@ -16,8 +16,8 @@
       display: flex;
       margin: 0;
       padding: 20px;
-      overflow: hidden; /* Prevent scrolling */
-      background: white; /* Ensure a contrasting background for blending mode */
+      overflow: hidden;
+      background: white;
     }
 
     .control-panel {
@@ -25,18 +25,19 @@
       top: 20px;
       right: 20px;
       z-index: 1000;
-      pointer-events: none; /* Allow clicks to pass through */
+      pointer-events: none;
     }
 
     .control-button {
-      background: none; /* No background */
+      background: none;
       border: none;
       padding: 0;
       cursor: pointer;
-      pointer-events: auto; /* Make the button clickable */
-      font-family: 'ABCGrow-A-Trial', Arial, sans-serif; /* Use the new font family */
-      font-size: 16px; /* Adjust size as needed */
-      color: blue; /* Change text color to black */
+      pointer-events: auto;
+      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
+      font-size: 16px;
+      color: blue;
+      mix-blend-mode: difference;
     }
 
     .image-row {
@@ -46,32 +47,32 @@
       width: 100%;
       height: 100%;
       display: flex;
-      overflow-x: auto; /* Enable horizontal scrolling */
-      scroll-snap-type: x mandatory; /* Snap to each page */
-      scroll-behavior: smooth; /* Smooth scrolling */
-      pointer-events: auto; /* Allow clicks on images */
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      pointer-events: auto;
       z-index: -1;
     }
 
     .image-page {
       display: flex;
-      flex-wrap: wrap; /* Allow images to wrap to the next row */
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
       width: 100vw;
       height: 100vh;
       flex-shrink: 0;
       scroll-snap-align: start;
-      gap: 20px; /* Space between images */
-      padding: 20px; /* Add padding to prevent cutting off */
-      overflow-y: auto; /* Allow vertical scrolling if necessary */
+      gap: 20px;
+      padding: 20px;
+      overflow-y: auto;
     }
 
     .image-page img {
       width: auto;
-      height: 40vh; /* Adjusted height */
-      max-width: 40vw; /* Adjusted width */
-      object-fit: contain; /* Keep aspect ratio without cropping */
+      height: 40vh;
+      max-width: 40vw;
+      object-fit: contain;
     }
 
     .main-content {
@@ -79,11 +80,6 @@
       padding: 20px 40px;
       position: relative;
       z-index: 1;
-    }
-
-    body {
-      min-height: 100vh;
-      position: relative;
     }
 
     .animated-text-container {
@@ -98,24 +94,50 @@
     }
 
     .animated-text {
-      flex: 16%; /* Adjust the flex property to make columns narrower */
+      flex: 1;
       max-width: 16%;
       margin: 0 10px;
       position: relative;
-      font-family: 'ABCGrow-A-Trial', Arial, sans-serif; /* Use the new font family */
-      color: blue; /* Ensure text color is black */
+      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
+      color: blue;
       text-decoration: none;
-      font-weight: bold;
+      mix-blend-mode: difference;
     }
 
     .animated-text span {
       display: inline-block;
       transition: transform 0.1s ease-out;
-
     }
 
     .animated-text:hover span {
       color: black;
+    }
+
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+      .control-panel {
+        display: none; /* Hide play/pause button on mobile */
+      }
+
+      .image-page img {
+        width: 100%; /* Full width on mobile */
+        height: auto; /* Maintain aspect ratio */
+        max-width: 100%; /* Remove max-width restriction */
+      }
+
+      .animated-text-container {
+        flex-direction: column; /* Stack columns on mobile */
+      }
+
+      .text-row {
+        flex-direction: column; /* Stack text rows on mobile */
+        gap: 10px; /* Add spacing between stacked rows */
+      }
+
+      .animated-text span {
+        transition: none !important; /* Disable text animation on mobile */
+        transform: none !important; /* Ensure no transform is applied */
+      }
     }
   </style>
 </head>
@@ -226,53 +248,62 @@
     // Call the function to distribute images
     distributeImages();
 
-    playPauseBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent click from reaching the images
-      isAnimationPaused = !isAnimationPaused;
-      playPauseBtn.textContent = isAnimationPaused ? 'PLAY' : 'PAUSE'; // Toggle between PLAY and PAUSE
-      document.body.classList.toggle('paused', isAnimationPaused);
-      
-      // Reset all letters to their original position when paused
-      if (isAnimationPaused) {
-        const letters = document.querySelectorAll('.animated-text span');
-        letters.forEach(letter => {
-          letter.style.transform = 'translate(0, 0)';
-        });
-      }
-    });
-
-    document.addEventListener('mousemove', function(e) {
-      if (isAnimationPaused) return;
-      
+    // Disable play/pause button and text animation on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      playPauseBtn.style.display = 'none'; // Hide play/pause button
       const letters = document.querySelectorAll('.animated-text span');
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
       letters.forEach(letter => {
-        const letterRect = letter.getBoundingClientRect();
-        const letterX = letterRect.left + letterRect.width / 2;
-        const letterY = letterRect.top + letterRect.height / 2;
-        const deltaX = mouseX - letterX;
-        const deltaY = mouseY - letterY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const maxDistance = Math.min(window.innerWidth, window.innerHeight) / 2;
-        const scaleFactor = Math.max(0.2, 1 - distance / maxDistance);
+        letter.style.transition = 'none'; // Disable text animation
+        letter.style.transform = 'none'; // Ensure no transform is applied
+      });
+    } else {
+      playPauseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isAnimationPaused = !isAnimationPaused;
+        playPauseBtn.textContent = isAnimationPaused ? 'PLAY' : 'PAUSE';
+        document.body.classList.toggle('paused', isAnimationPaused);
 
-        letter.style.transform = `translate(${deltaX * scaleFactor}px, ${deltaY * scaleFactor}px)`;
+        if (isAnimationPaused) {
+          const letters = document.querySelectorAll('.animated-text span');
+          letters.forEach(letter => {
+            letter.style.transform = 'translate(0, 0)';
+          });
+        }
       });
 
-      // Cursor change logic
-      const leftThird = window.innerWidth / 3;
-      const rightThird = window.innerWidth * 2 / 3;
+      document.addEventListener('mousemove', function(e) {
+        if (isAnimationPaused) return;
 
-      if (e.clientX < leftThird) {
-        document.body.style.cursor = 'w-resize';
-      } else if (e.clientX > rightThird) {
-        document.body.style.cursor = 'e-resize';
-      } else {
-        document.body.style.cursor = 'default';
-      }
-    });
+        const letters = document.querySelectorAll('.animated-text span');
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        letters.forEach(letter => {
+          const letterRect = letter.getBoundingClientRect();
+          const letterX = letterRect.left + letterRect.width / 2;
+          const letterY = letterRect.top + letterRect.height / 2;
+          const deltaX = mouseX - letterX;
+          const deltaY = mouseY - letterY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const maxDistance = Math.min(window.innerWidth, window.innerHeight) / 2;
+          const scaleFactor = Math.max(0.2, 1 - distance / maxDistance);
+
+          letter.style.transform = `translate(${deltaX * scaleFactor}px, ${deltaY * scaleFactor}px)`;
+        });
+
+        const leftThird = window.innerWidth / 3;
+        const rightThird = window.innerWidth * 2 / 3;
+
+        if (e.clientX < leftThird) {
+          document.body.style.cursor = 'w-resize';
+        } else if (e.clientX > rightThird) {
+          document.body.style.cursor = 'e-resize';
+        } else {
+          document.body.style.cursor = 'default';
+        }
+      });
+    }
 
     // Image click-through functionality
     const imagePages = document.querySelectorAll('.image-page');
@@ -281,15 +312,13 @@
     document.addEventListener('click', function(e) {
       const leftThird = window.innerWidth / 3;
       const rightThird = window.innerWidth * 2 / 3;
-      
+
       if (e.clientX < leftThird) {
-        // Move to previous page
         currentPage = (currentPage - 1 + imagePages.length) % imagePages.length;
       } else if (e.clientX > rightThird) {
-        // Move to next page
         currentPage = (currentPage + 1) % imagePages.length;
       }
-      
+
       imageRow.scrollTo({
         left: currentPage * window.innerWidth,
         behavior: 'smooth'
