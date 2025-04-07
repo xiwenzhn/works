@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Xiwen Zhang</title>
   <style>
     @font-face {
@@ -11,7 +11,38 @@
       font-weight: normal;
       font-style: normal;
     }
-
+    /* Different typeface for "Xiwen Zhang" header */
+    .animated-text i {
+      font-family: "FA_CAGQUBJICP", serif;
+    }
+    /* Different typeface for the play/pause button */
+    .control-button {
+      font-family: "FA_CAGQUBJICP";
+      color: black;
+    }
+    /* Default animated text styling */
+    .animated-text {
+      flex: 1;
+      margin: 0 10px;
+      position: relative;
+      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
+      color: blue;
+      text-decoration: none;
+      mix-blend-mode: difference;
+    }
+    .animated-text span {
+      display: inline-block;
+      transition: transform 0.1s ease-out;
+    }
+    .animated-text:hover span {
+      color: black;
+    }
+    /* When selected, override blend mode and add a subtle blue glow */
+    .animated-text.selected,
+    .animated-text.selected span {
+      mix-blend-mode: normal;
+      text-shadow: 0 0 8px rgba(0, 0, 255, 0.7);
+    }
     body {
       display: flex;
       margin: 0;
@@ -19,7 +50,6 @@
       overflow: hidden;
       background: white;
     }
-
     .control-panel {
       position: fixed;
       top: 20px;
@@ -27,19 +57,16 @@
       z-index: 1000;
       pointer-events: none;
     }
-
     .control-button {
       background: none;
       border: none;
       padding: 0;
       cursor: pointer;
       pointer-events: auto;
-      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
       font-size: 16px;
-      color: blue;
+      color: black;
       mix-blend-mode: difference;
     }
-
     .image-row {
       position: fixed;
       top: 0;
@@ -53,9 +80,9 @@
       pointer-events: auto;
       z-index: -1;
     }
-
     .image-page {
       display: flex;
+      /* Default is wrapping, but can be overridden */
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
@@ -67,77 +94,37 @@
       padding: 20px;
       overflow-y: auto;
     }
-
     .image-page img {
       width: auto;
       height: 40vh;
       max-width: 40vw;
       object-fit: contain;
     }
-
     .main-content {
       flex: 1;
       padding: 20px 40px;
       position: relative;
       z-index: 1;
     }
-
     .animated-text-container {
       display: flex;
       flex-direction: column;
       gap: 40px;
     }
-
     .text-row {
       display: flex;
       justify-content: space-between;
     }
-
-    .animated-text {
-      flex: 1;
-      margin: 0 10px;
-      position: relative;
-      font-family: 'ABCGrow-A-Trial', Arial, sans-serif;
-      color: blue;
-      text-decoration: none;
-      mix-blend-mode: difference;
-    }
-
-    .animated-text span {
-      display: inline-block;
-      transition: transform 0.1s ease-out;
-    }
-
-    .animated-text:hover span {
-      color: black;
-    }
-
-    /* Mobile-specific styles */
     @media (max-width: 768px) {
-      .control-panel {
-        display: none; /* Hide play/pause button on mobile */
-      }
-
+      .control-panel { display: none; }
       .image-page img {
-        width: 100%; /* Full width on mobile */
-        height: auto; /* Maintain aspect ratio */
-        max-width: 100%; /* Remove max-width restriction */
+        width: 100%;
+        height: auto;
+        max-width: 100%;
       }
-
-      .animated-text-container {
-        flex-direction: column; /* Stack columns on mobile */
-        max-width: 100% 
-      }
-
-      .text-row {
-        flex-direction: column; /* Stack text rows on mobile */
-        gap: 10px; /* Add spacing between stacked rows */
-      }
-
-      .animated-text span {
-        transition: none !important; /* Disable text animation on mobile */
-        transform: none !important; /* Ensure no transform is applied */
-      }
+      .animated-text-container { flex-direction: column; max-width: 100%; }
+      .text-row { flex-direction: column; gap: 10px; }
+      .animated-text span { transition: none !important; transform: none !important; }
     }
   </style>
 </head>
@@ -145,13 +132,10 @@
   <div class="control-panel">
     <button id="playPauseBtn" class="control-button">PAUSE</button>
   </div>
-  <div class="image-row">
-    <!-- Image pages will be dynamically generated here -->
-  </div>
-
+  <div class="image-row"></div>
   <div class="main-content">
     <div class="animated-text-container">
-      <!-- First row -->
+      <!-- First row: header and page 1 link -->
       <div class="text-row">
         <a href="1.jpeg" class="animated-text">
         <span>Xiwen Zhang</span> <span>i</span><span>s</span> <span>a</span><span>n</span> <span>i</span><span>n</span><span>t</span><span>e</span><span>r</span><span>d</span><span>i</span><span>s</span><span>c</span><span>i</span><span>p</span><span>l</span><span>i</span><span>n</span><span>a</span><span>ry</span> <span>a</span><span>r</span><span>t</span><span>i</span><span>s</span><span>t</span> <span>a</span><span>n</span><span>d</span> <span>d</span><span>e</span><span>s</span><span>i</span><span>g</span><span>n</span><span>e</span><span>r</span> <span>s</span><span>p</span><span>e</span><span>c</span><span>i</span><span>a</span><span>l</span><span>i</span><span>s</span><span>i</span><span>n</span><span>g</span> <span>i</span><span>n</span> <span>f</span><span>i</span><span>l</span><span>m</span> <span>a</span><span>n</span><span>d</span> <span>v</span><span>i</span><span>d</span><span>e</span><span>o</span><span>.</span> <span>T</span><span>h</span><span>e</span> <span>f</span><span>o</span><span>l</span><span>l</span><span>o</span><span>w</span><span>i</span><span>n</span><span>g</span>'s works <span>h</span><span>a</span><span>s</span> <span>b</span><span>e</span><span>e</span><span>n</span> <span>c</span><span>r</span><span>e</span><span>a</span><span>t</span><span>e</span><span>d</span> <span>a</span><span>n</span><span>d</span> <span>c</span><span>o</span><span>m</span><span>p</span><span>i</span><span>l</span><span>e</span><span>d</span> <span>f</span><span>r</span><span>o</span><span>m</span> <span>t</span><span>h</span><span>e</span> <span>y</span><span>e</span><span>a</span><span>r</span> 2022 - 2025 <span>a</span><span>s</span> <span>a</span> <span>n</span> <span>e</span><span>f</span><span>f</span><span>o</span><span>r</span><span>t</span> <span>t</span><span>o</span> <span>g</span><span>i</span><span>v</span><span>e</span> <span>p</span><span>h</span><span>y</span><span>s</span><span>i</span><span>c</span><span>a</span><span>l</span> <span>f</span><span>o</span><span>r</span><span>m</span> <span>t</span><span>o</span> <span>t</span><span>h</span><span>e</span> <span>l</span><span>a</span><span>b</span><span>y</span><span>r</span><span>i</span><span>n</span><span>t</span><span>h</span> <span>o</span><span>f</span> <span>i</span><span>d</span><span>e</span><span>a</span><span>s</span> <span>a</span><span>n</span><span>d</span> <span>t</span><span>h</span><span>o</span><span>u</span><span>g</span><span>h</span><span>t</span><span>s</span> <span>a</span><span>n</span><span>d</span> <span>f</span><span>e</span><span>e</span><span>l</span><span>i</span><span>n</span><span>g</span><span>s</span> <span>i</span><span>n</span><span>h</span> <span>e</span><span>r</span> <span>m</span><span>i</span><span>n</span><span>d</span>.
@@ -475,66 +459,142 @@
       </div>
     </div>
   </div>
-
   <script>
     let isAnimationPaused = false;
     const playPauseBtn = document.getElementById('playPauseBtn');
     const imageRow = document.querySelector('.image-row');
+    let originalLayoutHTML = "";
+    let currentPage = 0;
+    
+    // --- Fixed image URLs array (order is fixed; no shuffling)
     const imageUrls = [
-      "ezgif.com-video-to-gif-converter.gif", // Local GIF file (place it in the same directory as your HTML file)
-      "IMG_0592-ezgif.com-instagif.gif", // New GIF file
-      "https://i.postimg.cc/43n7V77w/IMG-7859.avif",
+      // Page 1: 4 images
+      "ezgif.com-video-to-gif-converter.gif",
       "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
-      "https://i.postimg.cc/xCzNxHzY/IMG-8584.avif",
-      "https://i.postimg.cc/kGZKsbqP/183194b1-1876-47e8-b28c-a1e65f1b8b4b.jpg",
-      "https://i.postimg.cc/Pqg3yJ25/2479967c-a373-4052-b1db-1a10775d2986.jpg",
-      "https://i.postimg.cc/wBVk5ZBQ/Screen-Shot-2024-09-02-at-3-58-33-PM.png",
-      "https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png",
-      "https://i.postimg.cc/vTkJPwqH/Screen-Shot-2024-11-27-at-12-58-14-AM.png",
-      "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
-      "https://i.postimg.cc/63jrmStZ/cover-hand-written-letters-site.png",
-      "https://i.postimg.cc/j5TP1XDd/ticket-design.jpg",
       "trimedvideo-ezgif.com-video-to-gif-converter.gif",
       "ezgif.com-video-to-gif-converter2.gif",
-      "https://i.postimg.cc/qqYq98Hf/label-cover.png",
+      // Page 2: 1 image (80% wh)
+      "https://i.postimg.cc/Pqg3yJ25/2479967c-a373-4052-b1db-1a10775d2986.jpg",
+      // Page 3: 2 images
+      "IMG_0592-ezgif.com-instagif.gif",
+      "https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png",
+      // Page 4: 3 images
+      "https://i.postimg.cc/63jrmStZ/cover-hand-written-letters-site.png",
+      "https://i.postimg.cc/5Nv9GYPT/IMG-0984.avif", 
+      "https://i.postimg.cc/4NKH3xWQ/Scan022681.png",
+      // Page 5: 4 images
+      "https://i.postimg.cc/vTkJPwqH/Screen-Shot-2024-11-27-at-12-58-14-AM.png",
+      "https://i.postimg.cc/kGZKsbqP/183194b1-1876-47e8-b28c-a1e65f1b8b4b.jpg",
       "https://i.postimg.cc/tTRvMbSK/IMG-8292.jpg",
-      "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg",
+      "https://i.postimg.cc/43n7V77w/IMG-7859.avif",
+      // Page 6: 1 image (60% wh)
+      "https://i.postimg.cc/L8pP0MVk/IMG-8584.jpg",
+      // Page 7: 3 images
+      "https://i.postimg.cc/j5TP1XDd/ticket-design.jpg",
+      "https://i.postimg.cc/Qtkk0x2T/tickt-front.png",
+      "https://i.postimg.cc/W3j0Fcdb/tickt-back.png",
+      // Page 8: 1 image (60% wh)
+      "https://i.postimg.cc/wBVk5ZBQ/Screen-Shot-2024-09-02-at-3-58-33-PM.png",
+      // Page 9: 1 image (80% wh)
+      "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
+      // Page 10: 2 images
+      "https://i.postimg.cc/qqYq98Hf/label-cover.png",
+      "https://i.postimg.cc/fLw0W7PV/Scan022705.png",
+      // Page 11: 1 image (60% wh)
+      "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg"
     ];
-
-    // Function to generate random number of images per page (1 to 4)
-    function getRandomNumberOfImages() {
-      return Math.floor(Math.random() * 4) + 1;
-    }
-
-    // Function to distribute images into pages
+    
+    // --- pagesOrder array defines the fixed layout per page.
+    const pagesOrder = [
+      { count: 4, style: { flexWrap: "nowrap" } },                // Page 1: 4 images, horizontal (nowrap)
+      { count: 1, style: { width: "80%", height: "80%" } },         // Page 2: 1 image (80% wh)
+      { count: 2, style: {} },                                     // Page 3: 2 images
+      { count: 3, style: {} },                                     // Page 4: 3 images
+      { count: 4, style: {} },                                     // Page 5: 4 images
+      { count: 1, style: { width: "60%", height: "60%" } },         // Page 6: 1 image (60% wh)
+      { count: 3, style: {} },                                     // Page 7: 3 images
+      { count: 1, style: { width: "60%", height: "60%" } },         // Page 8: 1 image (60% wh)
+      { count: 1, style: { width: "80%", height: "80%" } },         // Page 9: 1 image (80% wh)
+      { count: 2, style: {} },                                     // Page 10: 2 images
+      { count: 1, style: { width: "60%", height: "60%" } }           // Page 11: 1 image (60% wh)
+    ];
+    
+    // --- Distribute images into pages based on pagesOrder.
     function distributeImages() {
       let currentIndex = 0;
-      while (currentIndex < imageUrls.length) {
+      imageRow.innerHTML = '';
+      for (let p = 0; p < pagesOrder.length; p++) {
+        if (currentIndex >= imageUrls.length) break;
+        const spec = pagesOrder[p];
         const page = document.createElement('div');
         page.classList.add('image-page');
-        const numImages = getRandomNumberOfImages();
-        for (let i = 0; i < numImages && currentIndex < imageUrls.length; i++) {
+        if (spec.style.flexWrap) {
+          page.style.flexWrap = spec.style.flexWrap;
+        }
+        for (let i = 0; i < spec.count && currentIndex < imageUrls.length; i++) {
           const img = document.createElement('img');
           img.src = imageUrls[currentIndex];
           img.alt = `Image ${currentIndex + 1}`;
+          img.setAttribute('data-index', currentIndex);
+          if (spec.style.width) {
+            img.style.width = spec.style.width;
+          }
+          if (spec.style.height) {
+            img.style.height = spec.style.height;
+          }
           page.appendChild(img);
           currentIndex++;
         }
         imageRow.appendChild(page);
       }
     }
-
-    // Call the function to distribute images
     distributeImages();
-
-    // Disable play/pause button and text animation on mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      playPauseBtn.style.display = 'none'; // Hide play/pause button
-      const letters = document.querySelectorAll('.animated-text span');
-      letters.forEach(letter => {
-        letter.style.transition = 'none'; // Disable text animation
-        letter.style.transform = 'none'; // Ensure no transform is applied
+    originalLayoutHTML = imageRow.innerHTML;
+    
+    // --- Filtering: Each animated text link (except the header) now corresponds directly to a page.
+    // When a text block is clicked, we add the "selected" class (which adds a subtle glow)
+    // and scroll to that page.
+    document.querySelectorAll('.animated-text').forEach(link => {
+      link.addEventListener('click', function(e) {
+        // Skip header if it contains <i>
+        if (link.querySelector('i')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        // Remove "selected" class from all text links
+        document.querySelectorAll('.animated-text').forEach(l => l.classList.remove('selected'));
+        // Add "selected" class to the clicked link
+        link.classList.add('selected');
+        const firstSpan = link.querySelector('span');
+        if (!firstSpan) return;
+        const num = parseInt(firstSpan.textContent);
+        if (isNaN(num)) return;
+        const targetPageIndex = num - 1;
+        currentPage = targetPageIndex;
+        imageRow.scrollTo({ left: targetPageIndex * window.innerWidth, behavior: "smooth" });
+      });
+    });
+    
+    // --- Multi-page navigation (click-through) for the main layout.
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.animated-text')) return;
+      const pages = document.querySelectorAll('.image-page');
+      if (pages.length === 0) return;
+      const leftThird = window.innerWidth / 3;
+      const rightThird = window.innerWidth * 2 / 3;
+      if (e.clientX < leftThird) {
+        currentPage = (currentPage - 1 + pages.length) % pages.length;
+      } else if (e.clientX > rightThird) {
+        currentPage = (currentPage + 1) % pages.length;
+      }
+      imageRow.scrollTo({ left: currentPage * window.innerWidth, behavior: 'smooth' });
+    });
+    
+    // --- Play/Pause Animation (unchanged)
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      playPauseBtn.style.display = 'none';
+      document.querySelectorAll('.animated-text span').forEach(letter => {
+        letter.style.transition = 'none';
+        letter.style.transform = 'none';
       });
     } else {
       playPauseBtn.addEventListener('click', (e) => {
@@ -542,64 +602,37 @@
         isAnimationPaused = !isAnimationPaused;
         playPauseBtn.textContent = isAnimationPaused ? 'PLAY' : 'PAUSE';
         document.body.classList.toggle('paused', isAnimationPaused);
-
-        // When paused, hide <span> elements according to your rule:
-        // - If an anchor has <i>, hide all <span> in that anchor.
-        // - Otherwise, hide all <span> except the first one.
         if (isAnimationPaused) {
-          const animatedBlocks = document.querySelectorAll('.animated-text');
-          animatedBlocks.forEach(block => {
-            const spans = block.querySelectorAll('span');
-            if (block.querySelector('i')) {
-              // Hide all spans
-              spans.forEach(span => {
-                span.style.display = 'none';
-              });
-            } else {
-              // Hide all spans except the first
-              spans.forEach((span, index) => {
-                span.style.display = (index === 0) ? '' : 'none';
-              });
-            }
+          document.querySelectorAll('.animated-text').forEach(block => {
+            block.querySelectorAll('span').forEach((span, index) => {
+              span.style.display = block.querySelector('i') ? 'none' : (index === 0 ? '' : 'none');
+            });
           });
         } else {
-          // On resume, restore all spans
-          const allSpans = document.querySelectorAll('.animated-text span');
-          allSpans.forEach(span => {
+          document.querySelectorAll('.animated-text span').forEach(span => {
             span.style.display = '';
           });
         }
-
-        // Also reset transforms so they don't remain offset
-        const letters = document.querySelectorAll('.animated-text span');
-        letters.forEach(letter => {
+        document.querySelectorAll('.animated-text span').forEach(letter => {
           letter.style.transform = 'translate(0, 0)';
         });
       });
-
+      
       document.addEventListener('mousemove', function(e) {
         if (isAnimationPaused) return;
-
-        const letters = document.querySelectorAll('.animated-text span');
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-
-        letters.forEach(letter => {
-          const letterRect = letter.getBoundingClientRect();
-          const letterX = letterRect.left + letterRect.width / 2;
-          const letterY = letterRect.top + letterRect.height / 2;
-          const deltaX = mouseX - letterX;
-          const deltaY = mouseY - letterY;
+        document.querySelectorAll('.animated-text span').forEach(letter => {
+          const rect = letter.getBoundingClientRect();
+          const letterX = rect.left + rect.width / 2;
+          const letterY = rect.top + rect.height / 2;
+          const deltaX = e.clientX - letterX;
+          const deltaY = e.clientY - letterY;
           const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-          const maxDistance = Math.min(window.innerWidth, window.innerHeight) / 2;
-          const scaleFactor = Math.max(0.2, 1 - distance / maxDistance);
-
+          const maxDist = Math.min(window.innerWidth, window.innerHeight) / 2;
+          const scaleFactor = Math.max(0.2, 1 - distance / maxDist);
           letter.style.transform = `translate(${deltaX * scaleFactor}px, ${deltaY * scaleFactor}px)`;
         });
-
         const leftThird = window.innerWidth / 3;
         const rightThird = window.innerWidth * 2 / 3;
-
         if (e.clientX < leftThird) {
           document.body.style.cursor = 'w-resize';
         } else if (e.clientX > rightThird) {
@@ -609,26 +642,6 @@
         }
       });
     }
-
-    // Image click-through functionality
-    const imagePages = document.querySelectorAll('.image-page');
-    let currentPage = 0;
-
-    document.addEventListener('click', function(e) {
-      const leftThird = window.innerWidth / 3;
-      const rightThird = window.innerWidth * 2 / 3;
-
-      if (e.clientX < leftThird) {
-        currentPage = (currentPage - 1 + imagePages.length) % imagePages.length;
-      } else if (e.clientX > rightThird) {
-        currentPage = (currentPage + 1) % imagePages.length;
-      }
-
-      imageRow.scrollTo({
-        left: currentPage * window.innerWidth,
-        behavior: 'smooth'
-      });
-    });
   </script>
 </body>
 </html>
