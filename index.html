@@ -475,7 +475,7 @@
       // state
       let currentPage = 0;
       const imageRow = document.querySelector('.image-row');
-  
+    
       // your image URLs in order:
       const imageUrls = [
         "ezgif.com-video-to-gif-converter.gif",
@@ -502,8 +502,8 @@
         "https://i.postimg.cc/fLw0W7PV/Scan022705.png",
         "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg"
       ];
-  
-      // how many per page + any per-image sizing:
+    
+      // pagesOrder: how many images per page + any per-image sizing
       const pagesOrder = [
         {count:4, style:{flexWrap:"nowrap"}},
         {count:1, style:{width:"80%",height:"80%"}},
@@ -517,80 +517,78 @@
         {count:2, style:{}},
         {count:1, style:{width:"60%",height:"60%"}}
       ];
-  
-      // build the pages:
+    
+      // build the image‐pages
       function distributeImages(){
         let idx = 0;
         imageRow.innerHTML = '';
-        pagesOrder.forEach(spec=>{
+        pagesOrder.forEach(spec => {
           const page = document.createElement('div');
           page.classList.add('image-page');
-          if(spec.style.flexWrap) page.style.flexWrap = spec.style.flexWrap;
-          for(let i=0; i<spec.count && idx<imageUrls.length; i++, idx++){
+          if (spec.style.flexWrap) page.style.flexWrap = spec.style.flexWrap;
+          for (let i = 0; i < spec.count && idx < imageUrls.length; i++, idx++){
             const img = document.createElement('img');
             img.src = imageUrls[idx];
             img.alt = `Image ${idx+1}`;
-            if(spec.style.width)  img.style.width  = spec.style.width;
-            if(spec.style.height) img.style.height = spec.style.height;
+            if (spec.style.width)  img.style.width  = spec.style.width;
+            if (spec.style.height) img.style.height = spec.style.height;
             page.appendChild(img);
           }
           imageRow.appendChild(page);
         });
       }
       distributeImages();
-  
-      // click on a text‐block:
-      document.querySelectorAll('.animated-text').forEach(a=>{
-        a.addEventListener('click', e=>{
-          const txt = a.textContent.trim();
-          const m   = txt.match(/^(\d+)\./);
-          if(!m) return;               // no leading “N.” → let it follow its href
-          const n = parseInt(m[1],10);
-          if(n<=1) return;             // “1.” → let the link go external/normal
-  
-          // otherwise scroll:
-          e.preventDefault();
-          currentPage = n-1;
-          imageRow.scrollTo({
-            left: currentPage * window.innerWidth,
-            behavior: 'smooth'
-          });
-          document.querySelectorAll('.animated-text')
-                  .forEach(el=>el.classList.remove('selected'));
-          a.classList.add('selected');
-        });
+    
+      // intercept clicks on text‐blocks 2..N
+      document.querySelectorAll('.animated-text').forEach(a => {
+    a.addEventListener('click', e => {
+      // get the full visible text and look for a leading integer
+      const txt = a.textContent.trim();
+      const match = txt.match(/^(\d+)/);
+      if (!match) return;           // no leading number → normal link
+      const n = parseInt(match[1], 10);
+      if (n === 1) return;         // “1” → let it follow its href
+      // otherwise we scroll to page (n–1)
+      e.preventDefault();
+      currentPage = n - 1;
+      imageRow.scrollTo({
+        left: currentPage * window.innerWidth,
+        behavior: 'smooth'
       });
-  
-      // click‐through background:
-      document.addEventListener('click', e=>{
-        if(e.target.closest('.animated-text')) return;
+      document.querySelectorAll('.animated-text').forEach(el=>el.classList.remove('selected'));
+      a.classList.add('selected');
+    });
+  });
+
+    
+      // background click to step pages
+      document.addEventListener('click', e => {
+        if (e.target.closest('.animated-text')) return;
         const pages = document.querySelectorAll('.image-page');
-        if(!pages.length) return;
+        if (!pages.length) return;
         const w = window.innerWidth;
-        if(e.clientX <  w/3)       currentPage = (currentPage - 1 + pages.length) % pages.length;
-        else if(e.clientX > 2*w/3)  currentPage = (currentPage + 1) % pages.length;
-        else                         return;
+        if (e.clientX <  w/3)       currentPage = (currentPage - 1 + pages.length) % pages.length;
+        else if (e.clientX > 2*w/3)  currentPage = (currentPage + 1) % pages.length;
+        else                          return;
         imageRow.scrollTo({ left: currentPage * w, behavior: 'smooth' });
       });
-  
-      // play/pause animation (keep only first char visible on pause):
+    
+      // play/pause logic
       const playPauseBtn = document.getElementById('playPauseBtn');
       let isPaused = false;
-      if(!/iPhone|iPad|Android/i.test(navigator.userAgent)){
-        playPauseBtn.addEventListener('click', e=>{
+      if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){
+        playPauseBtn.addEventListener('click', e => {
           e.stopPropagation();
           isPaused = !isPaused;
           playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
-          document.querySelectorAll('.animated-text span').forEach((s,i)=>{
-            s.style.display = isPaused
-              ? (i===0 ? '' : 'none')
-              : '';
+          document.querySelectorAll('.animated-text span').forEach((s,i) => {
+            s.style.display = isPaused ? (i === 0 ? '' : 'none') : '';
           });
         });
-        document.addEventListener('mousemove', e=>{
-          if(isPaused) return;
+        document.addEventListener('mousemove', e => {
+          if (isPaused) return;
           const maxD = Math.min(window.innerWidth, window.innerHeight)/2;
-          document.querySelectorAll('.animated-text span').forEach(letter=>{
+          document.querySelectorAll('.animated-text span').forEach(letter => {
             const r = letter.getBoundingClientRect();
             const dx = e.clientX - (r.left + r.width/2);
             const dy = e.clientY - (r.top  + r.height/2);
@@ -602,7 +600,8 @@
         playPauseBtn.style.display = 'none';
       }
     })();
-  </script>
+    </script>
+    
   
 </body>
 </html>
