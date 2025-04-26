@@ -44,7 +44,7 @@
     .animated-text.selected,
     .animated-text.selected span {
       mix-blend-mode: normal;
-      text-shadow: 0 0 8px rgba(135, 135, 182, 0.7);
+      text-shadow: 0 0 8px rgba(217, 136, 144, 0.831);
     }
     body {
       display: flex;
@@ -95,7 +95,7 @@
       flex-shrink: 0;
       scroll-snap-align: start;
       gap: 20px;
-      padding: 20px;
+      /* padding: 20px; */
       overflow-y: auto;
     }
     .image-page img {
@@ -491,32 +491,45 @@
         "https://i.postimg.cc/vTkJPwqH/Screen-Shot-2024-11-27-at-12-58-14-AM.png",
         "https://i.postimg.cc/kGZKsbqP/183194b1-1876-47e8-b28c-a1e65f1b8b4b.jpg",
         "https://i.postimg.cc/tTRvMbSK/IMG-8292.jpg",
+
         "https://i.postimg.cc/43n7V77w/IMG-7859.avif",
-        "https://i.postimg.cc/L8pP0MVk/IMG-8584.jpg",
-        "https://i.postimg.cc/7ZbT1KBB/IMG-1123.png,"
+       "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",     
         "https://i.postimg.cc/j5TP1XDd/ticket-design.jpg",
         "https://i.postimg.cc/Qtkk0x2T/tickt-front.png",
         "https://i.postimg.cc/W3j0Fcdb/tickt-back.png",
+
+      
+
+        "https://i.postimg.cc/B62hSSH1/IMG-8584-preview.avif",
+        "https://i.postimg.cc/DfdCRz79/IMG-8587.png",
+
         "https://i.postimg.cc/wBVk5ZBQ/Screen-Shot-2024-09-02-at-3-58-33-PM.png",
-        "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
+
         "https://i.postimg.cc/qqYq98Hf/label-cover.png",
         "https://i.postimg.cc/fLw0W7PV/Scan022705.png",
-        "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg"
+
+        "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg",
+
+        "https://i.postimg.cc/7ZbT1KBB/IMG-1123.png",
+        "https://i.postimg.cc/j2gSLbrR/IMG-1131.avif",
+
       ];
     
       // pagesOrder: how many images per page + any per-image sizing
       const pagesOrder = [
-        {count:4, style:{flexWrap:"nowrap"}},
+        {count:4, style:{flexWrap:"nowrap", width:"35%", height:"35%"}},
         {count:1, style:{width:"80%",height:"80%"}},
         {count:2, style:{}},
         {count:3, style:{}},
         {count:4, style:{}},
         {count:1, style:{width:"60%",height:"60%"}},
         {count:3, style:{}},
-        {count:1, style:{width:"60%",height:"60%"}},
+        {count:2, style:{width:"60%",height:"60%"}},
         {count:1, style:{width:"80%",height:"80%"}},
         {count:2, style:{}},
-        {count:1, style:{width:"60%",height:"60%"}}
+        {count:1, style:{width:"60%",height:"60%"}},
+        {count:2, style:{width:"60%",height:"60%"}},
+        {count:2, style:{}}  
       ];
     
       // build the image‐pages
