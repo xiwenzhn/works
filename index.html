@@ -481,8 +481,8 @@
     (function(){
       let currentPage = 0;
       const imageRow = document.querySelector('.image-row');
-  
-      // your image URLs in order
+    
+      // your image URLs
       const imageUrls = [
         "ezgif.com-video-to-gif-converter.gif",
         "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
@@ -512,8 +512,7 @@
         "https://i.postimg.cc/j2gSLbrR/IMG-1131.avif",
         "https://i.postimg.cc/mkd2z2jz/cheese-book.png"
       ];
-  
-      // how many per page + sizing overrides
+      // pagesOrder: count + optional per-image sizing
       const pagesOrder = [
         {count:4, style:{flexWrap:"nowrap", width:"35%", height:"35%"}},
         {count:1, style:{width:"80%", height:"80%"}},
@@ -529,119 +528,127 @@
         {count:2, style:{width:"60%", height:"60%"}},
         {count:1, style:{width:"100%", height:"100%"}}
       ];
-  
-      // build pages
+    
+      // build all the pages
       function distributeImages(){
         let idx = 0;
         imageRow.innerHTML = '';
         pagesOrder.forEach(spec => {
-          const page = document.createElement('div');
-          page.classList.add('image-page');
-          if (spec.style.flexWrap) page.style.flexWrap = spec.style.flexWrap;
+          const pg = document.createElement('div');
+          pg.className = 'image-page';
+          if (spec.style.flexWrap) pg.style.flexWrap = spec.style.flexWrap;
           for (let i=0; i<spec.count && idx<imageUrls.length; i++, idx++){
             const img = document.createElement('img');
             img.src = imageUrls[idx];
             img.alt = `Image ${idx+1}`;
             if (spec.style.width)  img.style.width  = spec.style.width;
             if (spec.style.height) img.style.height = spec.style.height;
-            page.appendChild(img);
+            pg.appendChild(img);
           }
-          imageRow.appendChild(page);
+          imageRow.appendChild(pg);
         });
       }
       distributeImages();
-  
+    
       const pages = document.querySelectorAll('.image-page');
-      const blackPages = new Set([2,5,7]); // pages 3,6,8 → zero-based 2,5,7
-  
-      // paint black pages
+      const blackPages = new Set([2,5,7]); // 0-based indices for pages 3,6,8
+    
+      // paint black backgrounds
       pages.forEach((pg,i) => {
         if (blackPages.has(i)) pg.style.background = 'black';
       });
-  
-      // toggle all link colors to white on black pages
+    
+      // cache all the letters once
+      const allLetters = Array.from(document.querySelectorAll('.animated-text span'));
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      let isPaused = false;
+    
+      // update all text (and button) colors based on currentPage
       function updateTextColors(){
-        const isBlack = blackPages.has(currentPage);
+        const whiteOnBlack = blackPages.has(currentPage);
         document.querySelectorAll('.animated-text').forEach(a => {
-          a.style.color = isBlack ? 'white' : 'black';
+          a.style.color = whiteOnBlack ? 'white' : 'black';
           a.querySelectorAll('span,i').forEach(el => {
-            el.style.color = isBlack ? 'white' : 'black';
-
-            const btn = document.getElementById('playPauseBtn');
-  btn.style.color = isBlack ? 'white' : 'black';
-  // reset its mix-blend so the text shows clearly on black
-  btn.style.mixBlendMode = isBlack ? 'normal' : 'difference';
+            el.style.color = whiteOnBlack ? 'white' : 'black';
           });
         });
+        // play/pause button
+        playPauseBtn.style.color = whiteOnBlack ? 'white' : 'black';
+        playPauseBtn.style.mixBlendMode = whiteOnBlack ? 'normal' : 'difference';
       }
-  
-      // central navigation helper
+    
+      // central pager
       function goToPage(n){
         currentPage = n;
-        imageRow.scrollTo({ left: n*window.innerWidth, behavior:'smooth' });
+        imageRow.scrollTo({ left: n * window.innerWidth, behavior: 'smooth' });
+        // highlight the matching link
         document.querySelectorAll('.animated-text').forEach(el => el.classList.remove('selected'));
-        // re-select the clicked link
         document.querySelectorAll('.animated-text').forEach(el => {
           const m = el.textContent.trim().match(/^(\d+)\./);
-          if (m && parseInt(m[1],10) === n+1) el.classList.add('selected');
+          if (m && +m[1] === n+1) el.classList.add('selected');
         });
         updateTextColors();
       }
-  
-      // intercept your numbered links
+    
+      // intercept number-links
       document.querySelectorAll('.animated-text').forEach(a => {
         a.addEventListener('click', e => {
           const m = a.textContent.trim().match(/^(\d+)\./);
-          if (!m) return;            // no number → default href
-          const n = parseInt(m[1],10);
-          if (n === 1) return;       // "1." → follow external link
+          if (!m) return;       // no number → normal href
+          const n = +m[1];
+          if (n === 1) return;  // #1 is external
           e.preventDefault();
           goToPage(n-1);
         });
       });
-  
-      // background click to step pages
+    
+      // background click paging
       document.addEventListener('click', e => {
         if (e.target.closest('.animated-text')) return;
         const w = window.innerWidth;
         let next = currentPage;
-        if (e.clientX <  w/3)       next = (currentPage -1 + pages.length) % pages.length;
-        else if (e.clientX > 2*w/3)  next = (currentPage +1) % pages.length;
+        if (e.clientX <  w/3)      next = (currentPage - 1 + pages.length) % pages.length;
+        else if (e.clientX > 2*w/3) next = (currentPage + 1) % pages.length;
         else return;
         goToPage(next);
       });
-  
-      // initial color
-      updateTextColors();
-  
-      // your existing play/pause code here…
-      const playPauseBtn = document.getElementById('playPauseBtn');
-      let isPaused = false;
-      if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){
-        playPauseBtn.addEventListener('click', e=>{
+    
+      // play/pause logic + rAF throttle
+      if (!/iPhone|iPad|Android/i.test(navigator.userAgent)) {
+        playPauseBtn.addEventListener('click', e => {
           e.stopPropagation();
           isPaused = !isPaused;
           playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
-          document.querySelectorAll('.animated-text span').forEach((s,i)=>{
-            s.style.display = isPaused ? (i===0?'':'none') : '';
+          allLetters.forEach((s,i) => {
+            s.style.display = isPaused ? (i===0? '' : 'none') : '';
           });
         });
-        document.addEventListener('mousemove', e=>{
-          if (isPaused) return;
-          const maxD = Math.min(window.innerWidth,window.innerHeight)/2;
-          document.querySelectorAll('.animated-text span').forEach(letter=>{
-            const r = letter.getBoundingClientRect();
-            const dx = e.clientX - (r.left + r.width/2);
-            const dy = e.clientY - (r.top + r.height/2);
-            const f  = Math.max(0.2,1 - Math.hypot(dx,dy)/maxD);
-            letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
+    
+        let rafId = null;
+        document.addEventListener('mousemove', e => {
+          if (isPaused || rafId) return;
+          rafId = requestAnimationFrame(() => {
+            const maxD = Math.min(window.innerWidth,window.innerHeight)/2;
+            const cx = e.clientX, cy = e.clientY;
+            allLetters.forEach(letter => {
+              const r = letter.getBoundingClientRect();
+              const dx = cx - (r.left + r.width/2);
+              const dy = cy - (r.top  + r.height/2);
+              const f  = Math.max(0.2, 1 - Math.hypot(dx,dy)/maxD);
+              letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
+            });
+            rafId = null;
           });
         });
       } else {
         playPauseBtn.style.display = 'none';
       }
+    
+      // initial
+      goToPage(0);
     })();
     </script>
+    
   
     
   
