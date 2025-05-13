@@ -612,6 +612,19 @@
         else return;
         goToPage(next);
       });
+
+      // change cursor when hovering left or right thirds
+document.addEventListener('mousemove', e => {
+  const w = window.innerWidth;
+  if (e.clientX < w/3) {
+    document.body.style.cursor = 'w-resize';
+  } else if (e.clientX > 2*w/3) {
+    document.body.style.cursor = 'e-resize';
+  } else {
+    document.body.style.cursor = 'default';
+  }
+});
+
     
       // play/pause logic + rAF throttle
       if (!/iPhone|iPad|Android/i.test(navigator.userAgent)) {
