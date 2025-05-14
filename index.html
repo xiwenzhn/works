@@ -37,7 +37,6 @@
       font-family: 'ABCGrow-A-Trial';
       color: black;
       text-decoration: none;
-      mix-blend-mode: difference;
       font-size: 13px;
     }
     .animated-text span {
@@ -478,12 +477,13 @@
   </div>
   
   <script>
-    (function(){
+    ;(function(){
       let currentPage = 0;
-      const imageRow = document.querySelector('.image-row');
-    
-      // your image URLs
-      const imageUrls = [
+      const imageRow     = document.querySelector('.image-row');
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      let isPaused       = false;
+     // your imageUrls + pagesOrder arrays here…
+     const imageUrls = [
         "ezgif.com-video-to-gif-converter.gif",
         "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
         "trimedvideo-ezgif.com-video-to-gif-converter.gif",
@@ -510,7 +510,8 @@
         "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg",
         "https://i.postimg.cc/7ZbT1KBB/IMG-1123.png",
         "https://i.postimg.cc/j2gSLbrR/IMG-1131.avif",
-        "https://i.postimg.cc/mkd2z2jz/cheese-book.png"
+        "https://i.postimg.cc/mkd2z2jz/cheese-book.png",
+        "https://i.postimg.cc/VNzS6ZFt/IMG-1794.avif"
       ];
       // pagesOrder: count + optional per-image sizing
       const pagesOrder = [
@@ -526,10 +527,10 @@
         {count:2, style:{}},
         {count:1, style:{width:"60%", height:"60%"}},
         {count:2, style:{width:"60%", height:"60%"}},
+        {count:1, style:{width:"100%", height:"100%"}},
         {count:1, style:{width:"100%", height:"100%"}}
       ];
     
-      // build all the pages
       function distributeImages(){
         let idx = 0;
         imageRow.innerHTML = '';
@@ -537,10 +538,9 @@
           const pg = document.createElement('div');
           pg.className = 'image-page';
           if (spec.style.flexWrap) pg.style.flexWrap = spec.style.flexWrap;
-          for (let i=0; i<spec.count && idx<imageUrls.length; i++, idx++){
+          for (let i = 0; i < spec.count && idx < imageUrls.length; i++, idx++){
             const img = document.createElement('img');
             img.src = imageUrls[idx];
-            img.alt = `Image ${idx+1}`;
             if (spec.style.width)  img.style.width  = spec.style.width;
             if (spec.style.height) img.style.height = spec.style.height;
             pg.appendChild(img);
@@ -548,121 +548,107 @@
           imageRow.appendChild(pg);
         });
       }
+      // 2) build & paint pages
       distributeImages();
-    
       const pages = document.querySelectorAll('.image-page');
-      const blackPages = new Set([2,5,7]); // 0-based indices for pages 3,6,8
-    
-      // paint black backgrounds
+      const blackPages = new Set([2,5,7]);  // pages 3,6,8 → zero-based
       pages.forEach((pg,i) => {
         if (blackPages.has(i)) pg.style.background = 'black';
       });
     
-      // cache all the letters once
-      const allLetters = Array.from(document.querySelectorAll('.animated-text span'));
-      const playPauseBtn = document.getElementById('playPauseBtn');
-      let isPaused = false;
+      // 3) grab your text links & their letters
+      const textLinks   = Array.from(document.querySelectorAll('.animated-text'));
+      const pageLetters = textLinks.map(a => Array.from(a.querySelectorAll('span')));
+      const allLetters  = pageLetters.flat();
     
-      // update all text (and button) colors based on currentPage
       function updateTextColors(){
         const whiteOnBlack = blackPages.has(currentPage);
-        document.querySelectorAll('.animated-text').forEach(a => {
+        textLinks.forEach(a => {
           a.style.color = whiteOnBlack ? 'white' : 'black';
-          a.querySelectorAll('span,i').forEach(el => {
+          a.querySelectorAll('span,i').forEach(el=>{
             el.style.color = whiteOnBlack ? 'white' : 'black';
           });
         });
-        // play/pause button
-        playPauseBtn.style.color = whiteOnBlack ? 'white' : 'black';
+        playPauseBtn.style.color        = whiteOnBlack ? 'white' : 'black';
         playPauseBtn.style.mixBlendMode = whiteOnBlack ? 'normal' : 'difference';
       }
     
-      // central pager
       function goToPage(n){
         currentPage = n;
-        imageRow.scrollTo({ left: n * window.innerWidth, behavior: 'smooth' });
-        // highlight the matching link
-        document.querySelectorAll('.animated-text').forEach(el => el.classList.remove('selected'));
-        document.querySelectorAll('.animated-text').forEach(el => {
-          const m = el.textContent.trim().match(/^(\d+)\./);
-          if (m && +m[1] === n+1) el.classList.add('selected');
-        });
+        imageRow.scrollTo({ left: n*innerWidth, behavior:'smooth' });
+        textLinks.forEach(a=>a.classList.remove('selected'));
+        if (textLinks[n]) textLinks[n].classList.add('selected');
         updateTextColors();
       }
     
-      // intercept number-links
-      document.querySelectorAll('.animated-text').forEach(a => {
-        a.addEventListener('click', e => {
+      // 4) intercept your numbered links
+      textLinks.forEach(a=>{
+        a.addEventListener('click', e=>{
           const m = a.textContent.trim().match(/^(\d+)\./);
-          if (!m) return;       // no number → normal href
+          if (!m) return;
           const n = +m[1];
-          if (n === 1) return;  // #1 is external
+          if (n === 1) return;    // let “1.” follow its href
           e.preventDefault();
           goToPage(n-1);
         });
       });
     
-      // background click paging
-      document.addEventListener('click', e => {
+      // 5) background click paging
+      document.addEventListener('click', e=>{
         if (e.target.closest('.animated-text')) return;
-        const w = window.innerWidth;
+        const w = innerWidth, x = e.clientX;
         let next = currentPage;
-        if (e.clientX <  w/3)      next = (currentPage - 1 + pages.length) % pages.length;
-        else if (e.clientX > 2*w/3) next = (currentPage + 1) % pages.length;
+        if      (x <  w/3) next = (currentPage-1+pages.length)%pages.length;
+        else if (x > 2*w/3) next = (currentPage+1) % pages.length;
         else return;
         goToPage(next);
       });
-
-      // change cursor when hovering left or right thirds
-document.addEventListener('mousemove', e => {
-  const w = window.innerWidth;
-  if (e.clientX < w/3) {
-    document.body.style.cursor = 'w-resize';
-  } else if (e.clientX > 2*w/3) {
-    document.body.style.cursor = 'e-resize';
-  } else {
-    document.body.style.cursor = 'default';
-  }
-});
-
     
-      // play/pause logic + rAF throttle
-      if (!/iPhone|iPad|Android/i.test(navigator.userAgent)) {
-        playPauseBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          isPaused = !isPaused;
-          playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
-          allLetters.forEach((s,i) => {
-            s.style.display = isPaused ? (i===0? '' : 'none') : '';
-          });
+      // 6) cursor hint — left/right thirds
+      document.addEventListener('mousemove', e=>{
+        const w = innerWidth;
+        if      (e.clientX <  w/3)  document.body.style.cursor = 'w-resize';
+        else if (e.clientX > 2*w/3) document.body.style.cursor = 'e-resize';
+        else                         document.body.style.cursor = 'default';
+      }, { passive:true });
+    
+      // 7) play/pause
+      playPauseBtn.addEventListener('click', e=>{
+        e.stopPropagation();
+        isPaused = !isPaused;
+        playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
+        allLetters.forEach((span,i)=>{
+          span.style.display = isPaused ? (i===0 ? '' : 'none') : '';
         });
+      });
     
-        let rafId = null;
-        document.addEventListener('mousemove', e => {
-          if (isPaused || rafId) return;
-          rafId = requestAnimationFrame(() => {
-            const maxD = Math.min(window.innerWidth,window.innerHeight)/2;
-            const cx = e.clientX, cy = e.clientY;
-            allLetters.forEach(letter => {
-              const r = letter.getBoundingClientRect();
-              const dx = cx - (r.left + r.width/2);
-              const dy = cy - (r.top  + r.height/2);
-              const f  = Math.max(0.2, 1 - Math.hypot(dx,dy)/maxD);
-              letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
-            });
-            rafId = null;
-          });
-        });
-      } else {
-        playPauseBtn.style.display = 'none';
-      }
-    
-      // initial
+      // 8) only repel letters on the **active** page
+      let rafId = null;
+      document.addEventListener('mousemove', e => {
+  if (isPaused || rafId) return;
+  rafId = requestAnimationFrame(() => {
+    const maxD = Math.min(innerWidth, innerHeight)/2;
+    const cx = e.clientX, cy = e.clientY;
+
+    // loop over *every* span, not just the selected page
+    allLetters.forEach(letter => {
+      const r  = letter.getBoundingClientRect();
+      const dx = cx - (r.left + r.width/2);
+      const dy = cy - (r.top  + r.height/2);
+      const f  = Math.max(0.2, 1 - Math.hypot(dx,dy)/maxD);
+      letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
+    });
+
+    rafId = null;
+  });
+}, { passive: true });
+
+      // 9) start on page 1
       goToPage(0);
     })();
     </script>
     
-  
+    
     
   
 </body>
