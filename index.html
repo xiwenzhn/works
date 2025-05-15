@@ -477,13 +477,14 @@
   </div>
   
   <script>
-    ;(function(){
+    (function(){
       let currentPage = 0;
       const imageRow     = document.querySelector('.image-row');
       const playPauseBtn = document.getElementById('playPauseBtn');
       let isPaused       = false;
-     // your imageUrls + pagesOrder arrays here…
-     const imageUrls = [
+    
+      // ─── your image URLs in order ─────────────────────────────────────────────
+      const imageUrls = [
         "ezgif.com-video-to-gif-converter.gif",
         "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
         "trimedvideo-ezgif.com-video-to-gif-converter.gif",
@@ -510,10 +511,10 @@
         "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg",
         "https://i.postimg.cc/7ZbT1KBB/IMG-1123.png",
         "https://i.postimg.cc/j2gSLbrR/IMG-1131.avif",
-        "https://i.postimg.cc/mkd2z2jz/cheese-book.png",
-        "https://i.postimg.cc/VNzS6ZFt/IMG-1794.avif"
+        "https://i.postimg.cc/mkd2z2jz/cheese-book.png"
       ];
-      // pagesOrder: count + optional per-image sizing
+    
+      // ─── how many per page + optional sizing overrides ────────────────────────
       const pagesOrder = [
         {count:4, style:{flexWrap:"nowrap", width:"35%", height:"35%"}},
         {count:1, style:{width:"80%", height:"80%"}},
@@ -527,10 +528,10 @@
         {count:2, style:{}},
         {count:1, style:{width:"60%", height:"60%"}},
         {count:2, style:{width:"60%", height:"60%"}},
-        {count:1, style:{width:"100%", height:"100%"}},
         {count:1, style:{width:"100%", height:"100%"}}
       ];
     
+      // build your image pages
       function distributeImages(){
         let idx = 0;
         imageRow.innerHTML = '';
@@ -538,9 +539,10 @@
           const pg = document.createElement('div');
           pg.className = 'image-page';
           if (spec.style.flexWrap) pg.style.flexWrap = spec.style.flexWrap;
-          for (let i = 0; i < spec.count && idx < imageUrls.length; i++, idx++){
+          for (let i=0; i<spec.count && idx<imageUrls.length; i++, idx++){
             const img = document.createElement('img');
             img.src = imageUrls[idx];
+            img.alt = `Image ${idx+1}`;
             if (spec.style.width)  img.style.width  = spec.style.width;
             if (spec.style.height) img.style.height = spec.style.height;
             pg.appendChild(img);
@@ -548,22 +550,29 @@
           imageRow.appendChild(pg);
         });
       }
-      // 2) build & paint pages
       distributeImages();
-      const pages = document.querySelectorAll('.image-page');
-      const blackPages = new Set([2,5,7]);  // pages 3,6,8 → zero-based
-      pages.forEach((pg,i) => {
+    
+      const pages      = document.querySelectorAll('.image-page');
+      const blackPages = new Set([2,5,7]); // zero-based pages 3,6,8
+      pages.forEach((pg,i)=>{
         if (blackPages.has(i)) pg.style.background = 'black';
       });
     
-      // 3) grab your text links & their letters
-      const textLinks   = Array.from(document.querySelectorAll('.animated-text'));
-      const pageLetters = textLinks.map(a => Array.from(a.querySelectorAll('span')));
-      const allLetters  = pageLetters.flat();
+      // grab only the 1.–12. links in order
+      const numberedLinks = Array
+        .from(document.querySelectorAll('.animated-text'))
+        .filter(a => /^\d+\./.test(a.textContent.trim()));
     
+      // map each page-link → its spans, flatten for pause
+      const pageLetters = numberedLinks.map(a =>
+        Array.from(a.querySelectorAll('span'))
+      );
+      const allLetters = pageLetters.flat();
+    
+      // recolor text & button on black pages
       function updateTextColors(){
         const whiteOnBlack = blackPages.has(currentPage);
-        textLinks.forEach(a => {
+        document.querySelectorAll('.animated-text').forEach(a=>{
           a.style.color = whiteOnBlack ? 'white' : 'black';
           a.querySelectorAll('span,i').forEach(el=>{
             el.style.color = whiteOnBlack ? 'white' : 'black';
@@ -573,91 +582,78 @@
         playPauseBtn.style.mixBlendMode = whiteOnBlack ? 'normal' : 'difference';
       }
     
+      // central page scroller + highlight
       function goToPage(n){
-  currentPage = n;
-  imageRow.scrollTo({ left: n * innerWidth, behavior:'smooth' });
-
-  // remove all
-  textLinks.forEach(a => a.classList.remove('selected'));
-
-  // re-add only to the one whose leading number === currentPage+1
-  textLinks.forEach(a => {
-    const m = a.textContent.trim().match(/^(\d+)\./);
-    if (m && +m[1] === currentPage + 1) {
-      a.classList.add('selected');
-    }
-  });
-
-  updateTextColors();
-}
-
-      // 4) intercept your numbered links
-      textLinks.forEach(a => {
-  a.addEventListener('click', e => {
-    const m = a.textContent.trim().match(/^(\d+)\./);
-    if (!m) return;         // non-numbered links still behave normally
-    e.preventDefault();     // **always** hijack
-    const n = +m[1];
-    goToPage(n - 1);        // #1 → goToPage(0), #2 → goToPage(1), etc.
-  });
-});
-
+        currentPage = n;
+        imageRow.scrollTo({ left: n * innerWidth, behavior:'smooth' });
+        numberedLinks.forEach(a=>a.classList.remove('selected'));
+        numberedLinks[n]?.classList.add('selected');
+        updateTextColors();
+      }
     
-      // 5) background click paging
+      // link clicks → pages
+      numberedLinks.forEach(a=>{
+        a.addEventListener('click', e=>{
+          const num = +a.textContent.trim().match(/^(\d+)\./)[1];
+          if (num === 1) return;   // “1.” is external
+          e.preventDefault();
+          goToPage(num - 1);
+        });
+      });
+    
+      // background click for prev/next + cursor hint
+      document.addEventListener('mousemove', e => {
+        const w = innerWidth;
+        document.body.style.cursor = e.clientX < w/3
+          ? 'w-resize'
+          : e.clientX > 2*w/3
+            ? 'e-resize'
+            : 'default';
+      }, { passive:true });
+    
       document.addEventListener('click', e=>{
         if (e.target.closest('.animated-text')) return;
-        const w = innerWidth, x = e.clientX;
+        const w = innerWidth;
         let next = currentPage;
-        if      (x <  w/3) next = (currentPage-1+pages.length)%pages.length;
-        else if (x > 2*w/3) next = (currentPage+1) % pages.length;
+        if (e.clientX <  w/3)      next = (currentPage-1 + pages.length) % pages.length;
+        else if (e.clientX > 2*w/3) next = (currentPage+1) % pages.length;
         else return;
         goToPage(next);
       });
     
-      // 6) cursor hint — left/right thirds
-      document.addEventListener('mousemove', e=>{
-        const w = innerWidth;
-        if      (e.clientX <  w/3)  document.body.style.cursor = 'w-resize';
-        else if (e.clientX > 2*w/3) document.body.style.cursor = 'e-resize';
-        else                         document.body.style.cursor = 'default';
-      }, { passive:true });
-    
-      // 7) play/pause
+      // play/pause toggle (hides all but first letter when paused)
       playPauseBtn.addEventListener('click', e=>{
         e.stopPropagation();
         isPaused = !isPaused;
         playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
-        allLetters.forEach((span,i)=>{
-          span.style.display = isPaused ? (i===0 ? '' : 'none') : '';
+        allLetters.forEach((s,i)=>{
+          s.style.display = isPaused ? (i===0 ? '' : 'none') : '';
         });
       });
     
-      // 8) only repel letters on the **active** page
+      // rAF-throttled mousemove → repel only current page’s letters
       let rafId = null;
-      document.addEventListener('mousemove', e => {
-  if (isPaused || rafId) return;
-  rafId = requestAnimationFrame(() => {
-    const maxD = Math.min(innerWidth, innerHeight)/2;
-    const cx = e.clientX, cy = e.clientY;
-
-    // loop over *every* span, not just the selected page
-    allLetters.forEach(letter => {
-      const r  = letter.getBoundingClientRect();
-      const dx = cx - (r.left + r.width/2);
-      const dy = cy - (r.top  + r.height/2);
-      const f  = Math.max(0.2, 1 - Math.hypot(dx,dy)/maxD);
-      letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
-    });
-
-    rafId = null;
-  });
-}, { passive: true });
-
-      // 9) start on page 1
+      document.addEventListener('mousemove', e=>{
+        if (isPaused || rafId) return;
+        rafId = requestAnimationFrame(()=>{
+          const maxD = Math.min(innerWidth, innerHeight)/2;
+          const cx = e.clientX, cy = e.clientY;
+          pageLetters[currentPage].forEach(letter=>{
+            const r  = letter.getBoundingClientRect();
+            const dx = cx - (r.left + r.width/2);
+            const dy = cy - (r.top  + r.height/2);
+            const f  = Math.max(0.2, 1 - Math.hypot(dx,dy)/maxD);
+            letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
+          });
+          rafId = null;
+        });
+      }, { passive:true });
+    
+      // kick off page 1
       goToPage(0);
+    
     })();
     </script>
-    
     
     
   
