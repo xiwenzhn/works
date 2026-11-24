@@ -482,175 +482,160 @@ body.on-black .control-button { mix-blend-mode: normal; }
     </div>
   </div>
   
-  <script>
-    (function(){
-      let currentPage = 0;
-      const imageRow     = document.querySelector('.image-row');
-      const playPauseBtn = document.getElementById('playPauseBtn');
-      let isPaused       = false;
-    
-      // ─── your image URLs in order ─────────────────────────────────────────────
-      const imageUrls = [
-        "ezgif.com-video-to-gif-converter.gif",
-        "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
-        "trimedvideo-ezgif.com-video-to-gif-converter.gif",
-        "ezgif.com-video-to-gif-converter2.gif",
-        "https://i.postimg.cc/LXYfHJpH/2479967c-a373-4052-b1db-1a10775d2986.jpg",
-        "IMG_0592-ezgif.com-instagif.gif",
-        "https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png",
-        "https://i.postimg.cc/63jrmStZ/cover-hand-written-letters-site.png",
-        "https://i.postimg.cc/5Nv9GYPT/IMG-0984.avif",
-        "https://i.postimg.cc/4NKH3xWQ/Scan022681.png",
-        "https://i.postimg.cc/vTkJPwqH/Screen-Shot-2024-11-27-at-12-58-14-AM.png",
-        "https://i.postimg.cc/kGZKsbqP/183194b1-1876-47e8-b28c-a1e65f1b8b4b.jpg",
-        "https://i.postimg.cc/tTRvMbSK/IMG-8292.jpg",
-        "https://i.postimg.cc/43n7V77w/IMG-7859.avif",
-        "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
-        "https://i.postimg.cc/j5TP1XDd/ticket-design.jpg",
-        "https://i.postimg.cc/Qtkk0x2T/tickt-front.png",
-        "https://i.postimg.cc/W3j0Fcdb/tickt-back.png",
-        "https://i.postimg.cc/B62hSSH1/IMG-8584-preview.avif",
-        "https://i.postimg.cc/DfdCRz79/IMG-8587.png",
-        "https://i.postimg.cc/wBVk5ZBQ/Screen-Shot-2024-09-02-at-3-58-33-PM.png",
-        "https://i.postimg.cc/qqYq98Hf/label-cover.png",
-        "https://i.postimg.cc/fLw0W7PV/Scan022705.png",
-        "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg",
-        "https://i.postimg.cc/7ZbT1KBB/IMG-1123.png",
-        "https://i.postimg.cc/j2gSLbrR/IMG-1131.avif",
-        "https://i.postimg.cc/mkd2z2jz/cheese-book.png",
-        "https://i.postimg.cc/VNzS6ZFt/IMG-1794.avif",
-      ];
-    
-      // ─── how many per page + optional sizing overrides ────────────────────────
-      const pagesOrder = [
-        {count:4, style:{flexWrap:"nowrap", width:"35%", height:"35%"}},
-        {count:1, style:{width:"80%", height:"80%"}},
-        {count:2, style:{}},
-        {count:3, style:{}},
-        {count:4, style:{}},
-        {count:1, style:{width:"60%", height:"60%"}},
-        {count:3, style:{}},
-        {count:2, style:{width:"60%", height:"60%"}},
-        {count:1, style:{width:"80%", height:"80%"}},
-        {count:2, style:{}},
-        {count:1, style:{width:"60%", height:"60%"}},
-        {count:2, style:{width:"60%", height:"60%"}},
-        {count:1, style:{width:"100%", height:"100%"}},
-        {count:1, style:{width:"100%", height:"100%"}}
-      ];
-    
-      // build your image pages
-      function distributeImages(){
-        let idx = 0;
-        imageRow.innerHTML = '';
-        pagesOrder.forEach(spec => {
-          const pg = document.createElement('div');
-          pg.className = 'image-page';
-          if (spec.style.flexWrap) pg.style.flexWrap = spec.style.flexWrap;
-          for (let i=0; i<spec.count && idx<imageUrls.length; i++, idx++){
-            const img = document.createElement('img');
-            img.src = imageUrls[idx];
-            img.alt = `Image ${idx+1}`;
-            if (spec.style.width)  img.style.width  = spec.style.width;
-            if (spec.style.height) img.style.height = spec.style.height;
-            pg.appendChild(img);
-          }
-          imageRow.appendChild(pg);
-        });
-      }
-      distributeImages();
-    
-     const pages = document.querySelectorAll('.image-page');
-const blackPages = new Set([2, 5, 7]);
-pages.forEach((pg, i) => { if (blackPages.has(i)) pg.style.background = 'black'; });
+ <script>
+(function () {
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const imageRow = document.querySelector('.image-row');
+  let isAnimationPaused = false;
 
-const letters = Array.from(document.querySelectorAll('.animated-text span'));
-const isMobile = matchMedia('(max-width: 768px)').matches;
-let centers = [];
+  const imageUrls = [
+    "ezgif.com-video-to-gif-converter.gif",
+    "IMG_0592-ezgif.com-instagif.gif",
+    "https://i.postimg.cc/43n7V77w/IMG-7859.avif",
+    "https://i.postimg.cc/8zF7GzmG/Screen-Shot-2024-10-17-at-3-52-53-PM.png",
+    "https://i.postimg.cc/xCzNxHzY/IMG-8584.avif",
+    "https://i.postimg.cc/kGZKsbqP/183194b1-1876-47e8-b28c-a1e65f1b8b4b.jpg",
+    "https://i.postimg.cc/Pqg3yJ25/2479967c-a373-4052-b1db-1a10775d2986.jpg",
+    "https://i.postimg.cc/wBVk5ZBQ/Screen-Shot-2024-09-02-at-3-58-33-PM.png",
+    "https://i.postimg.cc/Y0zW4rX9/Screen-Shot-2024-04-01-at-10-11-55-PM.png",
+    "https://i.postimg.cc/vTkJPwqH/Screen-Shot-2024-11-27-at-12-58-14-AM.png",
+    "https://i.postimg.cc/cJzjjZBr/Screen-Shot-2024-04-07-at-6-47-51-PM.png",
+    "https://i.postimg.cc/63jrmStZ/cover-hand-written-letters-site.png",
+    "https://i.postimg.cc/j5TP1XDd/ticket-design.jpg",
+    "trimedvideo-ezgif.com-video-to-gif-converter.gif",
+    "ezgif.com-video-to-gif-converter2.gif",
+    "https://i.postimg.cc/qqYq98Hf/label-cover.png",
+    "https://i.postimg.cc/tTRvMbSK/IMG-8292.jpg",
+    "https://i.postimg.cc/L8RW1jk4/Xiwen-Zhang-Installation-View.jpg",
+  ];
 
-// Measure every letter's resting position once (not on every mouse move)
-function measure() {
-  letters.forEach(l => { l.style.transform = ''; });
-  centers = letters.map(l => {
-    const r = l.getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-  });
-}
-document.fonts.ready.then(measure);
-window.addEventListener('load', measure);
-let resizeT;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeT);
-  resizeT = setTimeout(measure, 150);
-});
-
-// Page navigation
-function goToPage(n) {
-  currentPage = n;
-  imageRow.scrollTo({ left: n * innerWidth, behavior: 'smooth' });
-  document.body.classList.toggle('on-black', blackPages.has(n));
-}
-
-// Click left/right third of the screen to change page (links with a real href still work)
-document.addEventListener('click', e => {
-  const a = e.target.closest('a');
-  if (a && a.getAttribute('href') && a.getAttribute('href') !== '#') return;
-  const w = innerWidth;
-  if (e.clientX < w / 3) goToPage((currentPage - 1 + pages.length) % pages.length);
-  else if (e.clientX > (2 * w) / 3) goToPage((currentPage + 1) % pages.length);
-});
-
-// Pause / play
-playPauseBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  isPaused = !isPaused;
-  playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
-
-  if (isPaused) {
-    document.querySelectorAll('.animated-text').forEach(block => {
-      const spans = block.querySelectorAll('span');
-      const hasI = !!block.querySelector('i');
-      spans.forEach((s, i) => {
-        s.style.transform = '';
-        s.style.display = hasI || i !== 0 ? 'none' : '';
-      });
-    });
-  } else {
-    letters.forEach(s => { s.style.display = ''; });
-    measure();
+  function getRandomNumberOfImages() {
+    return Math.floor(Math.random() * 4) + 1;
   }
-});
 
-// Mouse effect: all letters move, writes only, one update per frame
-if (!isMobile) {
-  let mx = 0, my = 0, ticking = false, cursor = '';
-
-  function render() {
-    ticking = false;
-    const maxD = Math.min(innerWidth, innerHeight) / 2;
-    for (let i = 0; i < letters.length; i++) {
-      const c = centers[i];
-      if (!c) continue;
-      const dx = mx - c.x, dy = my - c.y;
-      const f = Math.max(0.2, 1 - Math.hypot(dx, dy) / maxD);
-      letters[i].style.transform = `translate3d(${dx * f}px, ${dy * f}px, 0)`;
+  function distributeImages() {
+    let currentIndex = 0;
+    while (currentIndex < imageUrls.length) {
+      const page = document.createElement('div');
+      page.classList.add('image-page');
+      const numImages = getRandomNumberOfImages();
+      for (let i = 0; i < numImages && currentIndex < imageUrls.length; i++) {
+        const img = document.createElement('img');
+        img.src = imageUrls[currentIndex];
+        img.alt = `Image ${currentIndex + 1}`;
+        img.decoding = 'async';
+        img.loading = 'lazy';
+        page.appendChild(img);
+        currentIndex++;
+      }
+      imageRow.appendChild(page);
     }
   }
+  distributeImages();
 
-  document.addEventListener('mousemove', e => {
-    const w = innerWidth;
-    const c = e.clientX < w / 3 ? 'w-resize' : e.clientX > (2 * w) / 3 ? 'e-resize' : 'default';
-    if (c !== cursor) { cursor = c; document.body.style.cursor = c; }
+  const imagePages = document.querySelectorAll('.image-page');
+  const letters = Array.from(document.querySelectorAll('.animated-text span'));
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  let currentPage = 0;
 
-    if (isPaused) return;
-    mx = e.clientX; my = e.clientY;
-    if (!ticking) { ticking = true; requestAnimationFrame(render); }
-  }, { passive: true });
-}
+  if (isMobile) {
+    playPauseBtn.style.display = 'none';
+    letters.forEach(l => { l.style.transition = 'none'; l.style.transform = 'none'; });
+  } else {
+    let centers = [];
+    let mx = -9999, my = -9999;
+    let ticking = false;
+    let cursor = '';
 
-goToPage(0);
-    
-      </script>
+    // Measure each letter's RESTING position (transforms off), once
+    function measure() {
+      document.body.classList.add('measuring');
+      centers = letters.map(l => {
+        const r = l.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      });
+      document.body.classList.remove('measuring');
+    }
+
+    // Always computed from resting positions, so nothing can get stuck
+    function render() {
+      ticking = false;
+      if (isAnimationPaused) return;
+      const maxD = Math.min(innerWidth, innerHeight) / 2;
+      for (let i = 0; i < letters.length; i++) {
+        const c = centers[i];
+        if (!c) continue;
+        const dx = mx - c.x, dy = my - c.y;
+        const f = Math.max(0.2, 1 - Math.hypot(dx, dy) / maxD);
+        letters[i].style.transform = `translate3d(${dx * f}px, ${dy * f}px, 0)`;
+      }
+    }
+
+    function requestRender() {
+      if (!ticking) { ticking = true; requestAnimationFrame(render); }
+    }
+
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    window.addEventListener('load', measure);
+    let resizeT;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(() => { measure(); requestRender(); }, 150);
+    });
+    measure();
+
+    // Play / pause
+    playPauseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isAnimationPaused = !isAnimationPaused;
+      playPauseBtn.textContent = isAnimationPaused ? 'PLAY' : 'PAUSE';
+      document.body.classList.toggle('paused', isAnimationPaused);
+
+      if (isAnimationPaused) {
+        document.querySelectorAll('.animated-text').forEach(block => {
+          const spans = block.querySelectorAll('span');
+          const hasI = !!block.querySelector('i');
+          spans.forEach((span, index) => {
+            span.style.transform = 'translate(0, 0)';
+            span.style.display = (hasI || index !== 0) ? 'none' : '';
+          });
+        });
+      } else {
+        letters.forEach(span => { span.style.display = ''; });
+        measure();
+        requestRender();
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      const w = innerWidth;
+      const c = e.clientX < w / 3 ? 'w-resize' : e.clientX > (2 * w) / 3 ? 'e-resize' : 'default';
+      if (c !== cursor) { cursor = c; document.body.style.cursor = c; }
+
+      mx = e.clientX; my = e.clientY;
+      if (!isAnimationPaused) requestRender();
+    }, { passive: true });
+
+    // After a page turn, the text keeps following the cursor instead of freezing
+    window.__refreshText = requestRender;
+  }
+
+  // Click left/right third to turn the page
+  document.addEventListener('click', function (e) {
+    const leftThird = innerWidth / 3;
+    const rightThird = (innerWidth * 2) / 3;
+
+    if (e.clientX < leftThird) {
+      currentPage = (currentPage - 1 + imagePages.length) % imagePages.length;
+    } else if (e.clientX > rightThird) {
+      currentPage = (currentPage + 1) % imagePages.length;
+    }
+
+    imageRow.scrollTo({ left: currentPage * innerWidth, behavior: 'smooth' });
+    if (window.__refreshText) window.__refreshText();
+  });
+})();
+</script>
   
 </body>
 </html>
