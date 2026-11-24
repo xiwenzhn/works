@@ -39,13 +39,19 @@
       text-decoration: none;
       font-size: 13px;
     }
-    .animated-text span {
-      display: inline-block;
-      transition: transform 0.1s ease-out;
-    }
-    .animated-text:hover span {
-      color:0 0 8px rgba(126, 86, 90, 0.831);
-    }
+   .animated-text span {
+  display: inline-block;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+/* (delete the old .animated-text:hover span rule, it was invalid CSS) */
+
+/* white text on black pages, toggled by one class on <body> */
+body.on-black .animated-text,
+body.on-black .animated-text span,
+body.on-black .animated-text i,
+body.on-black .control-button { color: white; }
+body.on-black .control-button { mix-blend-mode: normal; }
     /* When selected, override blend mode and add a subtle glow */
     /* .animated-text.selected,
     .animated-text.selected span {
