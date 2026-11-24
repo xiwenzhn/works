@@ -554,110 +554,97 @@
       }
       distributeImages();
     
-      const pages      = document.querySelectorAll('.image-page');
-      const blackPages = new Set([2,5,7]); // zero-based pages 3,6,8
-      pages.forEach((pg,i)=>{
-        if (blackPages.has(i)) pg.style.background = 'black';
+     const pages = document.querySelectorAll('.image-page');
+const blackPages = new Set([2, 5, 7]);
+pages.forEach((pg, i) => { if (blackPages.has(i)) pg.style.background = 'black'; });
+
+const letters = Array.from(document.querySelectorAll('.animated-text span'));
+const isMobile = matchMedia('(max-width: 768px)').matches;
+let centers = [];
+
+// Measure every letter's resting position once (not on every mouse move)
+function measure() {
+  letters.forEach(l => { l.style.transform = ''; });
+  centers = letters.map(l => {
+    const r = l.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  });
+}
+document.fonts.ready.then(measure);
+window.addEventListener('load', measure);
+let resizeT;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeT);
+  resizeT = setTimeout(measure, 150);
+});
+
+// Page navigation
+function goToPage(n) {
+  currentPage = n;
+  imageRow.scrollTo({ left: n * innerWidth, behavior: 'smooth' });
+  document.body.classList.toggle('on-black', blackPages.has(n));
+}
+
+// Click left/right third of the screen to change page (links with a real href still work)
+document.addEventListener('click', e => {
+  const a = e.target.closest('a');
+  if (a && a.getAttribute('href') && a.getAttribute('href') !== '#') return;
+  const w = innerWidth;
+  if (e.clientX < w / 3) goToPage((currentPage - 1 + pages.length) % pages.length);
+  else if (e.clientX > (2 * w) / 3) goToPage((currentPage + 1) % pages.length);
+});
+
+// Pause / play
+playPauseBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  isPaused = !isPaused;
+  playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
+
+  if (isPaused) {
+    document.querySelectorAll('.animated-text').forEach(block => {
+      const spans = block.querySelectorAll('span');
+      const hasI = !!block.querySelector('i');
+      spans.forEach((s, i) => {
+        s.style.transform = '';
+        s.style.display = hasI || i !== 0 ? 'none' : '';
       });
+    });
+  } else {
+    letters.forEach(s => { s.style.display = ''; });
+    measure();
+  }
+});
+
+// Mouse effect: all letters move, writes only, one update per frame
+if (!isMobile) {
+  let mx = 0, my = 0, ticking = false, cursor = '';
+
+  function render() {
+    ticking = false;
+    const maxD = Math.min(innerWidth, innerHeight) / 2;
+    for (let i = 0; i < letters.length; i++) {
+      const c = centers[i];
+      if (!c) continue;
+      const dx = mx - c.x, dy = my - c.y;
+      const f = Math.max(0.2, 1 - Math.hypot(dx, dy) / maxD);
+      letters[i].style.transform = `translate3d(${dx * f}px, ${dy * f}px, 0)`;
+    }
+  }
+
+  document.addEventListener('mousemove', e => {
+    const w = innerWidth;
+    const c = e.clientX < w / 3 ? 'w-resize' : e.clientX > (2 * w) / 3 ? 'e-resize' : 'default';
+    if (c !== cursor) { cursor = c; document.body.style.cursor = c; }
+
+    if (isPaused) return;
+    mx = e.clientX; my = e.clientY;
+    if (!ticking) { ticking = true; requestAnimationFrame(render); }
+  }, { passive: true });
+}
+
+goToPage(0);
     
-      // grab only the 1.–12. links in order
-      const numberedLinks = Array
-        .from(document.querySelectorAll('.animated-text'))
-        .filter(a => /^\d+\./.test(a.textContent.trim()));
-    
-      // map each page-link → its spans, flatten for pause
-      const pageLetters = numberedLinks.map(a =>
-        Array.from(a.querySelectorAll('span'))
-      );
-      const allLetters = pageLetters.flat();
-    
-      // recolor text & button on black pages
-      function updateTextColors(){
-        const whiteOnBlack = blackPages.has(currentPage);
-        document.querySelectorAll('.animated-text').forEach(a=>{
-          a.style.color = whiteOnBlack ? 'white' : 'black';
-          a.querySelectorAll('span,i').forEach(el=>{
-            el.style.color = whiteOnBlack ? 'white' : 'black';
-          });
-        });
-        playPauseBtn.style.color        = whiteOnBlack ? 'white' : 'black';
-        playPauseBtn.style.mixBlendMode = whiteOnBlack ? 'normal' : 'difference';
-      }
-    
-      // central page scroller + highlight
-      function goToPage(n){
-        currentPage = n;
-        imageRow.scrollTo({ left: n * innerWidth, behavior:'smooth' });
-        numberedLinks.forEach(a=>a.classList.remove('selected'));
-        numberedLinks[n]?.classList.add('selected');
-        updateTextColors();
-      }
-    
-      // link clicks → pages
-      numberedLinks.forEach(a=>{
-        a.addEventListener('click', e=>{
-          const num = +a.textContent.trim().match(/^(\d+)\./)[1];
-          if (num === 1) return;   // “1.” is external
-          e.preventDefault();
-          goToPage(num - 1);
-        });
-      });
-    
-      // background click for prev/next + cursor hint
-      document.addEventListener('mousemove', e => {
-        const w = innerWidth;
-        document.body.style.cursor = e.clientX < w/3
-          ? 'w-resize'
-          : e.clientX > 2*w/3
-            ? 'e-resize'
-            : 'default';
-      }, { passive:true });
-    
-      document.addEventListener('click', e=>{
-        if (e.target.closest('.animated-text')) return;
-        const w = innerWidth;
-        let next = currentPage;
-        if (e.clientX <  w/3)      next = (currentPage-1 + pages.length) % pages.length;
-        else if (e.clientX > 2*w/3) next = (currentPage+1) % pages.length;
-        else return;
-        goToPage(next);
-      });
-    
-      // play/pause toggle (hides all but first letter when paused)
-      playPauseBtn.addEventListener('click', e=>{
-        e.stopPropagation();
-        isPaused = !isPaused;
-        playPauseBtn.textContent = isPaused ? 'PLAY' : 'PAUSE';
-        allLetters.forEach((s,i)=>{
-          s.style.display = isPaused ? (i===0 ? '' : 'none') : '';
-        });
-      });
-    
-      // rAF-throttled mousemove → repel only current page’s letters
-      let rafId = null;
-      document.addEventListener('mousemove', e=>{
-        if (isPaused || rafId) return;
-        rafId = requestAnimationFrame(()=>{
-          const maxD = Math.min(innerWidth, innerHeight)/2;
-          const cx = e.clientX, cy = e.clientY;
-          pageLetters[currentPage].forEach(letter=>{
-            const r  = letter.getBoundingClientRect();
-            const dx = cx - (r.left + r.width/2);
-            const dy = cy - (r.top  + r.height/2);
-            const f  = Math.max(0.2, 1 - Math.hypot(dx,dy)/maxD);
-            letter.style.transform = `translate(${dx*f}px,${dy*f}px)`;
-          });
-          rafId = null;
-        });
-      }, { passive:true });
-    
-      // kick off page 1
-      goToPage(0);
-    
-    })();
-    </script>
-    
-    
+      </script>
   
 </body>
 </html>
